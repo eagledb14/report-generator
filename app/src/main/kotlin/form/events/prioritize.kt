@@ -7,7 +7,10 @@ fun getPriority(cve: String, vuln: Vuln): Triple<String, Int, String> {
         vuln.cvss_v2
     }
     val rank = getRank(cvss, vuln.epss, vuln.kev)
-    return Triple(cve, rank, vuln.summary.replace(">", ")").replace("<", "(").replace("\n", " "))
+    //val summary = vuln.summary.replace(">", ")").replace("<", "(").replace("\n", " ")
+    val summary = "https://www.cve.org/CVERecord?id=${cve}"
+
+    return Triple(cve, rank, summary)
 }
 
 private fun getRank(cvss: Float?, epss: Float?, kev: Boolean?): Int {
