@@ -25,7 +25,7 @@ class CreateOpenPortDoc(
     val events: List<Event>,
 ) : CreateDoc {
     val docname = ".${File.separator}open_port_edited.docx"
-    var orgName = events.first().name
+    var orgName = events.first().name.replace(Regex("[\\/:*?\"<>|]"), "-")
     var ipAddress = events.map{ it.ip }.joinToString(", ")
 
     override fun createDoc() {
@@ -60,8 +60,10 @@ class CreateOpenPortDoc(
             val infString = docxFile.indexOf("inf_impact_insert")
             val start = docxFile.lastIndexOf("<w:p ", infString)
             val end = docxFile.indexOf("</w:p>", infString) + 6
-            val infSub = docxFile.substring(start, end)
-            docxFile = docxFile.replace(infSub, splitList(ipAddress))
+            if (start != -1 && end != -1 && infString != -1) {
+                val infSub = docxFile.substring(start, end)
+                docxFile = docxFile.replace(infSub, splitList(ipAddress))
+            }
         } else {
             docxFile = docxFile.replace("inf_impact_insert", "") 
         }
@@ -71,8 +73,10 @@ class CreateOpenPortDoc(
             val sourceString = docxFile.indexOf("source_insert")
             val start = docxFile.lastIndexOf("<w:p ", sourceString)
             val end = docxFile.indexOf("</w:p>", sourceString) + 6
-            val sourceSub = docxFile.substring(start, end)
-            docxFile = docxFile.replace(sourceSub, splitList(source))
+            if (start != -1 && end != -1 && sourceString != -1) {
+                val sourceSub = docxFile.substring(start, end)
+                docxFile = docxFile.replace(sourceSub, splitList(source))
+            }
         } else {
             docxFile = docxFile.replace("source_insert", "") 
         }
@@ -82,8 +86,10 @@ class CreateOpenPortDoc(
             val refString = docxFile.indexOf("port_or_cve_list_insert")
             val start = docxFile.lastIndexOf("<w:tr ", refString)
             val end = docxFile.indexOf("</w:tr>", refString) + 7
-            val refSub = docxFile.substring(start, end)
-            docxFile = docxFile.replace(refSub, this.splitTable())
+            if (start != -1 && end != -1 && refString != -1) {
+                val refSub = docxFile.substring(start, end)
+                docxFile = docxFile.replace(refSub, this.splitTable())
+            }
         } else {
             docxFile = docxFile.replace("port_or_cve_list_insert", "")
         }
@@ -92,22 +98,26 @@ class CreateOpenPortDoc(
         if (additionalReferences != "") {
             docxFile = docxFile.replace("reference_insert", additionalReferences)
         } else {
-            val refstring = docxFile.indexOf("reference_insert")
-            val start = docxFile.lastIndexOf("<w:tr ", refstring)
-            val end = docxFile.indexOf("</w:tr>", refstring) + 7
-            val refsub = docxFile.substring(start, end)
-            docxFile = docxFile.replace(refsub, "")
+            val refString = docxFile.indexOf("reference_insert")
+            val start = docxFile.lastIndexOf("<w:tr ", refString)
+            val end = docxFile.indexOf("</w:tr>", refString) + 7
+            if (start != -1 && end != -1 && refString != -1) {
+                val refsub = docxFile.substring(start, end)
+                docxFile = docxFile.replace(refsub, "")
+            }
         }
 
         //Deletes the references if there are no cves
         if (!events.any { it.cves.isNotEmpty() }) {
-            val refstring = docxFile.indexOf("CVE Priority Key")
-            val start = docxFile.lastIndexOf("<w:tr ", refstring)
+            val refString = docxFile.indexOf("CVE Priority Key")
+            val start = docxFile.lastIndexOf("<w:tr ", refString)
 
             val endString = docxFile.indexOf("Priority-5")
             val end = docxFile.indexOf("</w:tr>", endString) + 7
-            val refsub = docxFile.substring(start, end)
-            docxFile = docxFile.replace(refsub, "")
+            if (start != -1 && end != -1 && refString != -1 && endString != -1) {
+                val refsub = docxFile.substring(start, end)
+                docxFile = docxFile.replace(refsub, "")
+            }
         }
 
         doc.writeText(docxFile)
