@@ -5,6 +5,7 @@ enum class Page {
     OpenPort,
     Filter,
     Events,
+    Actor,
 }
 
 enum class Form {
@@ -67,6 +68,7 @@ fun buildTitle(page: Page): String {
         Page.OpenPort -> "OpenPort"
         Page.Events -> "Events"
         Page.Filter -> "Filters"
+        Page.Actor -> "Actor Profile"
         // Page.Prio -> "Prioritizer"
         // Page.Populate -> "Populate"
     }
@@ -86,6 +88,7 @@ fun buildHeader(page: Page): String {
             <button class="rounded bg-white p-2 mx-2 ring-2 ring-yellow-500 ring-inset" hx-get="/credleak" hx-target="#content" >Cred Leak</button>
             <button class="rounded hover:bg-white hover:text-black text-white p-2 mx-2" hx-get="/populate" hx-target="#content" >Open Port</button>
             <button class="rounded hover:bg-white hover:text-black text-white p-2 mx-2" hx-get="/events" hx-target="#content" >Events</button>
+            <button class="rounded hover:bg-white hover:text-black text-white p-2 mx-2" hx-get="/actor" hx-target="#content" >Actor</button>
         </div>
     </div>
     """
@@ -96,6 +99,7 @@ fun buildHeader(page: Page): String {
             <button class="rounded hover:bg-white hover:text-black text-white p-2 mx-2" hx-get="/credleak" hx-target="#content" >Cred Leak</button>
             <button class="rounded bg-white p-2 mx-2 ring-2 ring-yellow-500 ring-inset" hx-get="/populate" hx-target="#content" >Open Port</button>
             <button class="rounded hover:bg-white hover:text-black text-white p-2 mx-2" hx-get="/events" hx-target="#content" >Events</button>
+            <button class="rounded hover:bg-white hover:text-black text-white p-2 mx-2" hx-get="/actor" hx-target="#content" >Actor</button>
         </div>
     </div>
     """
@@ -106,6 +110,7 @@ fun buildHeader(page: Page): String {
             <button class="rounded hover:bg-white hover:text-black text-white p-2 mx-2" hx-get="/credleak" hx-target="#content" >Cred Leak</button>
             <button class="rounded hover:bg-white hover:text-black text-white p-2 mx-2" hx-get="/populate" hx-target="#content" >Open Port</button>
             <button class="rounded bg-white p-2 mx-2 ring-2 ring-yellow-500 ring-inset" hx-get="/events" hx-target="#content" >Events</button>
+            <button class="rounded hover:bg-white hover:text-black text-white p-2 mx-2" hx-get="/actor" hx-target="#content" >Actor</button>
         </div>
         <div>
             <button class="rounded text-white hover:text-black hover:bg-white p-2 mx-2" hx-post="/events/download" hx-indicator="#load" hx-target="#ring">Update Events</button>
@@ -119,9 +124,20 @@ fun buildHeader(page: Page): String {
             <button class="rounded hover:bg-white hover:text-black text-white p-2 mx-2" hx-get="/credleak" hx-target="#content" >Cred Leak</button>
             <button class="rounded hover:bg-white hover:text-black text-white p-2 mx-2" hx-get="/populate" hx-target="#content" >Open Port</button>
             <button class="rounded hover:bg-white hover:text-black text-white p-2 mx-2" hx-get="/events" hx-target="#content" >Events</button>
+            <button class="rounded hover:bg-white hover:text-black text-white p-2 mx-2" hx-get="/actor" hx-target="#content" >Actor</button>
         </div>
         <div>
             <button class="rounded text-white bg-white p-2 mx-2 ring-2 ring-yellow-500 ring-inset" hx-get="/filter" hx-indicator="#load" hx-target="#content">Filters</button>
+        </div>
+    </div>
+    """
+    Page.Actor -> """
+    <div class="py-4 bg-blue-800 rounded-b-lg flex justify-between">
+        <div>
+            <button class="rounded hover:bg-white hover:text-black text-white p-2 mx-2" hx-get="/credleak" hx-target="#content" >Cred Leak</button>
+            <button class="rounded hover:bg-white hover:text-black text-white p-2 mx-2" hx-get="/populate" hx-target="#content" >Open Port</button>
+            <button class="rounded hover:bg-white hover:text-black text-white p-2 mx-2" hx-get="/events" hx-target="#content" >Events</button>
+            <button class="rounded bg-white p-2 mx-2 ring-2 ring-yellow-500 ring-inset" hx-get="/actor" hx-target="#content" >Actor</button>
         </div>
     </div>
     """

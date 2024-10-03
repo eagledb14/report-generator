@@ -258,6 +258,125 @@ class CreateCredLeakFileDoc(
     }
 }
 
+class CreateActorProfile(
+    val name: String, 
+    val alias: String, 
+    val date: String, 
+    val country: String, 
+    val motivation: String, 
+    val target: String, 
+    val malware: String, 
+    val reporter: String,
+    val confidence: String, 
+    val exploits: String, 
+    val summary: String,
+    val capabilities: String, 
+    val detection: String, 
+    val ttps: String, 
+    val infra: String, 
+) : CreateDoc {
+    val docname = ".${File.separator}actor_profile.docx"
+
+    override fun createDoc() {
+        val tempDoc = ".${File.separator}temp"
+        this.writeToFile(tempDoc)
+        zipDocument(tempDoc, name.replace(Regex("[\\/:*?\"<>|]"), "-"), "")
+
+    }
+
+    override fun writeToFile(tempDoc: String) {
+        ZipFile(".${File.separator}reference${File.separator}${this.docname}").extractAll(tempDoc)
+
+        val doc = File(".${File.separator}temp${File.separator}word${File.separator}document.xml")
+
+        var docxFile = doc.readText()
+        docxFile = docxFile.replace("{name}", name)
+        docxFile = docxFile.replace("{alias}", alias)
+        docxFile = docxFile.replace("{date}", date)
+        docxFile = docxFile.replace("{country}", country)
+        docxFile = docxFile.replace("{motivation}", motivation)
+        docxFile = docxFile.replace("{confidence}", confidence)
+
+        val details = """This malware is unique and only seen with ${country}s' nation state attacks. According to ${reporter}, the ${name} malware family is the name given to malware developed and controlled by an intelligence directorate supporting the nation state ${country}.""""
+        docxFile = docxFile.replace("{details}", details)
+        docxFile = docxFile.replace("{cve}", exploits)
+        docxFile = docxFile.replace("{summary}", summary)
+
+        if (capabilities != "") {
+            val refString = docxFile.indexOf("{capabilities}")
+            var start = docxFile.lastIndexOf("<w:p>", refString)
+
+            val end = docxFile.indexOf("</w:p>", refString) + 6
+            if (start != -1 && end != -1 && refString != -1) {
+                val refsub = docxFile.substring(start, end)
+                docxFile = docxFile.replace(refsub, splitBulletPoint(capabilities))
+            }
+        } else {
+            docxFile = docxFile.replace("{capabilities}", "")
+        }
+
+        if (detection != "") 
+            val refString = docxFile.indexOf("{detection}")
+            var start = docxFile.lastIndexOf("<w:p>", refString)
+
+            val end = docxFile.indexOf("</w:p>", refString) + 6
+            if (start != -1 && end != -1 && refString != -1) {
+                val refsub = docxFile.substring(start, end)
+                docxFile = docxFile.replace(refsub, splitBulletPoint(detection))
+            }
+        } else {
+            docxFile = docxFile.replace("{detection}", "")
+        }
+
+        if (ttps != "") {
+            val refString = docxFile.indexOf("{ttps}")
+            var start = docxFile.lastIndexOf("<w:p>", refString)
+
+            val end = docxFile.indexOf("</w:p>", refString) + 6
+            if (start != -1 && end != -1 && refString != -1) {
+                val refsub = docxFile.substring(start, end)
+                docxFile = docxFile.replace(refsub, splitBulletPoint(ttps))
+            }
+        } else {
+            docxFile = docxFile.replace("{ttps}", "")
+        }
+
+        if (infra != "") {
+            val refString = docxFile.indexOf("{infra}")
+            var start = docxFile.lastIndexOf("<w:p>", refString)
+
+            val end = docxFile.indexOf("</w:p>", refString) + 6
+            if (start != -1 && end != -1 && refString != -1) {
+                val refsub = docxFile.substring(start, end)
+                docxFile = docxFile.replace(refsub, splitBulletPoint(infra))
+            }
+        } else {
+            docxFile = docxFile.replace("{infra}", "")
+        }
+
+        doc.writeText(docxFile)
+    }
+
+    override fun getOrgname(): String {
+        return ""
+    }
+
+    override fun getAlertId(): String {
+
+        return ""
+    }
+
+    override fun getIps(): String {
+
+        return ""
+    }
+
+    override fun getAlertName(): String {
+
+        return ""
+    }
+}
+
 fun splitList(list: String): String {
     return list
     .split("[,\\s]".toRegex())
@@ -286,6 +405,13 @@ fun splitHeadedList(list: String): String {
     }
     
     return builder.toString()
+}
+
+fun splitBulletPoint(list: String): String {
+    return list
+    .split("\n")
+    .map{ """<w:p w14:paraId="485619EC" w14:textId="04A28E1E" w:rsidR="001961C3" w:rsidRPr="00196A91" w:rsidRDefault="00196A91" w:rsidP="001961C3"><w:pPr><w:pStyle w:val="ListParagraph"/><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr><w:jc w:val="both"/><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:color w:val="000000"/></w:rPr></w:pPr><w:r w:rsidRPr="00196A91"><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:color w:val="000000"/></w:rPr><w:t>${it}</w:t></w:r></w:p>"""}
+    .joinToString("")
 }
 
 fun splitParagraph(list: String): String {

@@ -56,5 +56,6 @@ fun Application.start() {
         populate()
 
         filter()
+        actor()
     }
 }

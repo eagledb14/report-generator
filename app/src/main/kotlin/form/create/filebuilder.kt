@@ -39,6 +39,28 @@ class CredLeakFileBuilder() {
     }
 }
 
+class ActorProfileBuilder() {
+    fun buildFromMap(map: HashMap<String, String>): CreateDoc {
+        return CreateActorProfile(
+            map["name"]?.trim()?.replace(">", ")")?.replace("<", "(")?: "",
+            map["alias"]?.trim()?.replace(">", ")")?.replace("<", "(")?: "",
+            map["date"]?.trim()?.replace(">", ")")?.replace("<", "(")?: "",
+            map["country"]?.trim()?.replace(">", ")")?.replace("<", "(")?: "",
+            map["motivation"]?.trim()?.replace(">", ")")?.replace("<", "(")?: "",
+            map["target"]?.trim()?.replace(">", ")")?.replace("<", "(")?: "",
+            map["malware"]?.trim()?.replace(">", ")")?.replace("<", "(")?: "",
+            map["reporter"]?.trim()?.replace(">", ")")?.replace("<", "(")?: "",
+            map["confidence"]?.trim()?.replace(">", ")")?.replace("<", "(")?: "",
+            map["exploits"]?.trim()?.replace(">", ")")?.replace("<", "(")?: "",
+            map["summary"]?.trim()?.replace(">", ")")?.replace("<", "(")?: "",
+            map["capabilities"]?.trim()?.replace(">", ")")?.replace("<", "(")?: "",
+            map["detection"]?.trim()?.replace(">", ")")?.replace("<", "(")?: "",
+            map["ttps"]?.trim()?.replace(">", ")")?.replace("<", "(")?: "",
+            map["infra"]?.trim()?.replace(">", ")")?.replace("<", "(")?: "",
+        )
+    }
+}
+
 fun createDocument(doc: CreateDoc, ips: Boolean) {
 
     if (ips) {
