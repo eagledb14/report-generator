@@ -149,7 +149,8 @@ class CreateOpenPortDoc(
             if (it.cves.size > 0) {
                 title = "Ports and CVEs"
             }
-            """<w:tr w:rsidR="007438A5" w:rsidRPr="00CE4213" w14:paraId="1CC9F227" w14:textId="77777777" w:rsidTr="009E01CE"><w:trPr><w:trHeight w:val="294"/></w:trPr><w:tc><w:tcPr><w:tcW w:w="1710" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="E6E6E6"/></w:tcPr><w:p w14:paraId="373B8676" w14:textId="3DF70593" w:rsidR="007438A5" w:rsidRPr="00CE4213" w:rsidRDefault="00B068CA" w:rsidP="00BB2555"><w:pPr><w:rPr><w:rFonts w:asciiTheme="minorHAnsi" w:hAnsiTheme="minorHAnsi" w:cstheme="minorHAnsi"/><w:b/><w:bCs/><w:sz w:val="24"/></w:rPr></w:pPr><w:r w:rsidRPr="00385E00"><w:rPr><w:rFonts w:asciiTheme="minorHAnsi" w:hAnsiTheme="minorHAnsi" w:cstheme="minorHAnsi"/><w:b/><w:bCs/><w:sz w:val="24"/></w:rPr><w:t xml:space="preserve">List of </w:t></w:r><w:r w:rsidR="00DE2088" w:rsidRPr="00385E00"><w:rPr><w:rFonts w:asciiTheme="minorHAnsi" w:hAnsiTheme="minorHAnsi" w:cstheme="minorHAnsi"/><w:b/><w:bCs/><w:sz w:val="24"/></w:rPr><w:t>${title}</w:t></w:r><w:r w:rsidR="00BB2555"><w:rPr><w:rFonts w:asciiTheme="minorHAnsi" w:hAnsiTheme="minorHAnsi" w:cstheme="minorHAnsi"/><w:b/><w:bCs/><w:sz w:val="24"/></w:rPr><w:t xml:space="preserve"> on</w:t></w:r><w:r w:rsidRPr="00385E00"><w:rPr><w:rFonts w:asciiTheme="minorHAnsi" w:hAnsiTheme="minorHAnsi" w:cstheme="minorHAnsi"/><w:b/><w:bCs/><w:sz w:val="24"/></w:rPr><w:t xml:space="preserve"> </w:t></w:r><w:r w:rsidRPr="0075021F"><w:rPr><w:rFonts w:asciiTheme="minorHAnsi" w:hAnsiTheme="minorHAnsi" w:cstheme="minorHAnsi"/><w:b/><w:bCs/></w:rPr><w:t>${it.ip}</w:t></w:r></w:p></w:tc><w:tc><w:tcPr><w:tcW w:w="9450" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="auto"/></w:tcPr><w:p w14:paraId="7673BE80" w14:textId="3CFA088B" w:rsidR="007438A5" w:rsidRPr="00385E00" w:rsidRDefault="00634FCD" w:rsidP="004B6A5F"><w:pPr><w:rPr><w:rFonts w:asciiTheme="minorHAnsi" w:eastAsiaTheme="minorEastAsia" w:hAnsiTheme="minorHAnsi" w:cstheme="minorHAnsi"/><w:bCs/><w:szCs w:val="20"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:asciiTheme="minorHAnsi" w:eastAsiaTheme="minorEastAsia" w:hAnsiTheme="minorHAnsi" w:cstheme="minorHAnsi"/><w:bCs/><w:szCs w:val="20"/></w:rPr><w:t>${splitHeadedList(it.cveParagraph())}</w:t></w:r></w:p></w:tc></w:tr>"""
+            """<w:tr w:rsidR="007438A5" w:rsidRPr="00CE4213" w14:paraId="1CC9F227" w14:textId="77777777" w:rsidTr="009E01CE"><w:trPr><w:trHeight w:val="294"/></w:trPr><w:tc><w:tcPr><w:tcW w:w="1710" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="E6E6E6"/></w:tcPr><w:p w14:paraId="373B8676" w14:textId="3DF70593" w:rsidR="007438A5" w:rsidRPr="00CE4213" w:rsidRDefault="00B068CA" w:rsidP="00BB2555"><w:pPr><w:rPr><w:rFonts w:asciiTheme="minorHAnsi" w:hAnsiTheme="minorHAnsi" w:cstheme="minorHAnsi"/><w:b/><w:bCs/><w:sz w:val="24"/></w:rPr></w:pPr><w:r w:rsidRPr="00385E00"><w:rPr><w:rFonts w:asciiTheme="minorHAnsi" w:hAnsiTheme="minorHAnsi" w:cstheme="minorHAnsi"/><w:b/><w:bCs/><w:sz w:val="24"/></w:rPr><w:t xml:space="preserve">List of </w:t></w:r><w:r w:rsidR="00DE2088" w:rsidRPr="00385E00"><w:rPr><w:rFonts w:asciiTheme="minorHAnsi" w:hAnsiTheme="minorHAnsi" w:cstheme="minorHAnsi"/><w:b/><w:bCs/><w:sz w:val="24"/></w:rPr><w:t>${title}</w:t></w:r><w:r w:rsidR="00BB2555"><w:rPr><w:rFonts w:asciiTheme="minorHAnsi" w:hAnsiTheme="minorHAnsi" w:cstheme="minorHAnsi"/><w:b/><w:bCs/><w:sz w:val="24"/></w:rPr><w:t xml:space="preserve"> on</w:t></w:r><w:r w:rsidRPr="00385E00"><w:rPr><w:rFonts w:asciiTheme="minorHAnsi" w:hAnsiTheme="minorHAnsi" w:cstheme="minorHAnsi"/><w:b/><w:bCs/><w:sz w:val="24"/></w:rPr><w:t xml:space="preserve"> </w:t></w:r><w:r w:rsidRPr="0075021F"><w:rPr><w:rFonts w:asciiTheme="minorHAnsi" w:hAnsiTheme="minorHAnsi" w:cstheme="minorHAnsi"/><w:b/><w:bCs/></w:rPr><w:t>${it.ip}</w:t></w:r></w:p></w:tc><w:tc><w:tcPr><w:tcW w:w="9450" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="auto"/></w:tcPr>${splitHeadedList(it.cveParagraph())}</w:tc></w:tr>"""
+            
         }.joinToString("")
     }
 }
@@ -315,7 +316,7 @@ class CreateActorProfile(
             docxFile = docxFile.replace("{capabilities}", "")
         }
 
-        if (detection != "") 
+        if (detection != "") {
             val refString = docxFile.indexOf("{detection}")
             var start = docxFile.lastIndexOf("<w:p>", refString)
 
@@ -392,14 +393,16 @@ fun splitHeadedList(list: String): String {
         if (line == "") {
             continue
         }
+        
         val parts = line.split(" ", limit=2)
 
         if (parts.size > 1) {
             val head = parts[0]
             val body = parts[1]
-            builder.append("""<w:p w14:paraId="7673BE80" w14:textId="5BC07D38" w:rsidR="005F189B" w:rsidRPr="00385E00" w:rsidRDefault="005F189B" w:rsidP="004B6A5F"><w:pPr><w:rPr><w:rFonts w:asciiTheme="minorHAnsi" w:eastAsiaTheme="minorEastAsia" w:hAnsiTheme="minorHAnsi" w:cstheme="minorHAnsi"/><w:bCs/><w:szCs w:val="20"/></w:rPr></w:pPr><w:r w:rsidRPr="005F189B"><w:rPr><w:rFonts w:asciiTheme="minorHAnsi" w:eastAsiaTheme="minorEastAsia" w:hAnsiTheme="minorHAnsi" w:cstheme="minorHAnsi"/><w:b/><w:bCs/><w:szCs w:val="20"/></w:rPr><w:t>${head} </w:t></w:r><w:r><w:rPr><w:rFonts w:asciiTheme="minorHAnsi" w:eastAsiaTheme="minorEastAsia" w:hAnsiTheme="minorHAnsi" w:cstheme="minorHAnsi"/><w:bCs/><w:szCs w:val="20"/></w:rPr><w:t xml:space="preserve"> $body</w:t></w:r><w:bookmarkStart w:id="0" w:name="_GoBack"/><w:bookmarkEnd w:id="0"/></w:p>""")
+            builder.append("""<w:p><w:r><w:rPr><w:b/></w:rPr><w:t xml:space="preserve">${head} </w:t></w:r><w:r><w:t xml:space="preserve">${body}</w:t></w:r></w:p>""")
         } else {
-            builder.append("""<w:p w14:paraId="516364BC" w14:textId="77777777" w:rsidR="007438A5" w:rsidRDefault="009014C6" w:rsidP="004B6A5F"><w:pPr><w:rPr><w:rFonts w:asciiTheme="minorHAnsi" w:eastAsiaTheme="minorEastAsia" w:hAnsiTheme="minorHAnsi" w:cstheme="minorHAnsi"/><w:bCs/><w:szCs w:val="20"/></w:rPr></w:pPr><w:proofErr w:type="spellStart"/><w:r w:rsidRPr="00385E00"><w:rPr><w:rFonts w:asciiTheme="minorHAnsi" w:eastAsiaTheme="minorEastAsia" w:hAnsiTheme="minorHAnsi" w:cstheme="minorHAnsi"/><w:bCs/><w:szCs w:val="20"/></w:rPr><w:t>${parts[0]}</w:t></w:r><w:proofErr w:type="spellEnd"/></w:p>""")
+            val head = parts[0]
+            builder.append("""<w:p><w:t xml:space="preserve">${head}</w:t></w:p>""")
         }
         builder.append("<w:p></w:p>")
     }
