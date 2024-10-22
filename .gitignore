@@ -2,7 +2,7 @@
 # Ignore Gradle build output directory
 build
 
-*/resources
+/resources
 *.env
 *.docx
 shodan-form*

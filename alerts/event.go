@@ -7,17 +7,19 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
 
 type Event struct {
-	Ip        string
-	Trigger   string
-	AlertLink string
-	HostLink  string
-	Desc      string
-	Timestamp time.Time
+	Ip          string
+	Trigger     string
+	TriggerPort int
+	AlertLink   string
+	HostLink    string
+	Desc        string
+	Timestamp   time.Time
 
 	Loaded  bool
 	AlertId string
@@ -29,7 +31,7 @@ func NewEventFromItem(item Item) Event {
 	splitTitle := strings.Split(item.Title, " ")
 	ip := splitTitle[0]
 	trigger := strings.ReplaceAll(splitTitle[len(splitTitle)-1], "`", "")
-	port := splitTitle[3]
+	port, _ := strconv.Atoi(splitTitle[3])
 
 	timestamp, err := time.Parse("Sun, 20 Oct 2024 14:33:09 +0000", item.PubDate)
 	if err != nil {
@@ -37,14 +39,15 @@ func NewEventFromItem(item Item) Event {
 	}
 
 	return Event{
-		Ip:        ip,
-		Trigger:   trigger,
-		AlertLink: item.Link,
-		HostLink:  "https://www.shodan.io/host/" + ip,
-		Desc:      item.Description + " on port " + port,
-		Timestamp: timestamp,
-		Ports:     make(map[int][]Cve),
-		Loaded:    false,
+		Ip:          ip,
+		Trigger:     trigger,
+		TriggerPort: port,
+		AlertLink:   item.Link,
+		HostLink:    "https://www.shodan.io/host/" + ip,
+		Desc:        item.Description + " on port " + string(port),
+		Timestamp:   timestamp,
+		Ports:       make(map[int][]Cve),
+		Loaded:      false,
 	}
 }
 
@@ -197,6 +200,8 @@ type Rss struct {
 }
 
 func Download() []Event {
+	cache := NewEventCache()
+
 	apiKey := os.Getenv("API_KEY")
 	response, _ := http.Get("https://monitor.shodan.io/events.rss?key=" + apiKey)
 
@@ -214,7 +219,11 @@ func Download() []Event {
 	events := []Event{}
 
 	for _, item := range rss.Channel.Item {
-		events = append(events, NewEventFromItem(item))
+		newEvent := NewEventFromItem(item)
+		if cache.HasEventBeenSeen(newEvent) == false {
+			events = append(events, newEvent)
+			cache.InsertEvent(newEvent)
+		}
 	}
 
 	return events

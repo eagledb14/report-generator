@@ -13,19 +13,21 @@ import (
 
 func main() {
 	// fmt.Println("Hellow Worl")
-	LoadEnvVars()
+	loadEnvVars()
 	// fmt.Println(alerts.Download())
 	ch := make(chan int)
-	for _, a := range alerts.Download() {
-		// a.GetName(0)
-		// a.GetAlertId(0)
-		// a.GetName(0)
-		// fmt.Println(a.Name)
-
-		go a.Load()
-		// fmt.Println(a)
-		// beak
-	}
+	// for _, a := range alerts.Download() {
+	// 	// a.GetName(0)
+	// 	// a.GetAlertId(0)
+	// 	// a.GetName(0)
+	// 	// fmt.Println(a.Name)
+	//
+	// 	go a.Load()
+	// 	// fmt.Println(a)
+	// 	// beak
+	// }
+	events := alerts.Download()
+	fmt.Println(len(events))
 	<-ch
 	// fmt.Println(os.Getenv("API_KEY"))
 	// alerts.Download()
@@ -63,7 +65,7 @@ func openBrowser(url string) {
 	}
 }
 
-func LoadEnvVars() error {
+func loadEnvVars() error {
 	file, err := os.Open("./resources/key.env")
 	if err != nil {
 		return fmt.Errorf("error opening file: %v", err)
