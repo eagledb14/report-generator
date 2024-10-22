@@ -15,10 +15,18 @@ func main() {
 	// fmt.Println("Hellow Worl")
 	LoadEnvVars()
 	// fmt.Println(alerts.Download())
+	ch := make(chan int)
 	for _, a := range alerts.Download() {
-		a.GetName(0)
-		fmt.Println(a.Name)
+		// a.GetName(0)
+		// a.GetAlertId(0)
+		// a.GetName(0)
+		// fmt.Println(a.Name)
+
+		go a.Load()
+		// fmt.Println(a)
+		// beak
 	}
+	<-ch
 	// fmt.Println(os.Getenv("API_KEY"))
 	// alerts.Download()
 
@@ -89,4 +97,3 @@ func LoadEnvVars() error {
 
 	return nil
 }
-
