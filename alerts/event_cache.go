@@ -38,7 +38,7 @@ timestamp TEXT
 )`)
 }
 
-func (e *EventCache) HasEventBeenSeen(event Event) bool {
+func (e *EventCache) HasEventBeenSeen(event *Event) bool {
 	tx, err := e.db.Begin()
 	defer tx.Commit()
 
@@ -76,7 +76,7 @@ func (e *EventCache) HasEventBeenSeen(event Event) bool {
 	return false
 }
 
-func (e *EventCache) InsertEvent(event Event) {
+func (e *EventCache) InsertEvent(event *Event) {
 	if e.HasEventBeenSeen(event) {
 		return
 	}

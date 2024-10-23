@@ -10,6 +10,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/eagledb14/form-scanner/alerts"
 	createform "github.com/eagledb14/form-scanner/create-form"
 	t "github.com/eagledb14/form-scanner/templates"
 	"github.com/gofiber/fiber/v2"
@@ -35,6 +36,12 @@ func main() {
 	// <-ch
 	// fmt.Println(os.Getenv("API_KEY"))
 	// alerts.Download()
+	// events := alerts.DownloadIpList("monkey", "24.246.129.0/24")
+	// fmt.Println(len(events))
+	// for _, e := range events {
+	// 	fmt.Println(len(e.Ports))
+	// }
+	// fmt.Println(events)
 
 	go openBrowser("localhost:8080")
 	serv(":8080")
@@ -55,7 +62,7 @@ func serv(port string) {
 	app.Post("/credleak", func(c *fiber.Ctx) error {
 		c.Set("Content-Type", "text/html")
 
-		form :=	createform.CredLeak{
+		form := createform.CredLeak{
 			OrgName:    c.FormValue("orgName"),
 			FormNumber: c.FormValue("formNumber"),
 			VictimOrg:  c.FormValue("victimOrg"),
@@ -68,14 +75,24 @@ func serv(port string) {
 			Reference:  c.FormValue("reference"),
 			Tlp:        c.FormValue("tlp"),
 		}
-		fmt.Println(form)
+		_ = form
 
 		return c.SendString(t.BuildPage(t.Index()))
 	})
 
 	app.Get("/openport", func(c *fiber.Ctx) error {
 		c.Set("Content-Type", "text/html")
-		return c.SendString(t.BuildPage(t.OpenPort()))
+
+		return c.SendString(t.BuildPage(t.OpenPortDownload()))
+	})
+
+	app.Post("/openportform", func(c *fiber.Ctx) error {
+		name := c.FormValue("orgName")
+		ips := c.FormValue("ipAddress")
+
+		events := alerts.DownloadIpList(name, ips)
+		events = alerts.FilterEvents(events)
+		return c.SendString(t.BuildPage(t.OpenPortForm(name, events)))
 	})
 
 	app.Get("/actor", func(c *fiber.Ctx) error {

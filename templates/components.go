@@ -39,7 +39,7 @@ func ExecuteText(name string, t string, data interface{}) string {
 
 func Banner() string {
 	return `
-        <div class="header">
+        <div class="heading">
             <nav style="margin: 0px 10px">
                     <ul>
                             <li><a href="/credleak"><kbd>Cred Leak</kbd></a></li>
@@ -81,10 +81,8 @@ func BuildPage(body string) string {
         {{.Header}}
         <body hx-boost="true">
 	    {{.Banner}}
-            <div class="grid">
-                <div></div>
-                <div>{{.Body}}</div>
-                <div></div>
+            <div class="center">
+                {{.Body}}
             </div>
         </body>
         </html>

@@ -5,24 +5,24 @@ import (
 )
 
 type Feed struct {
-	events []Event
+	events []*Event
 	Index int
 }
 
 func NewFeed() Feed {
-	events := Download()
+	events := DownloadRss()
 	return Feed{
 		events: events,
 		Index: 0,
 	}
 }
 
-func (f *Feed) Next() Event {
+func (f *Feed) Next() *Event {
 	f.Index = min(f.Index + 1, len(f.events) - 1)
 	return f.GetEvent()
 }
 
-func (f *Feed) GetEvent() Event {
+func (f *Feed) GetEvent() *Event {
 	for f.events[f.Index].Loaded != true {
 		time.Sleep(1)
 	}
@@ -30,7 +30,7 @@ func (f *Feed) GetEvent() Event {
 	return f.events[f.Index]
 }
 
-func (f *Feed) Prev() Event {
+func (f *Feed) Prev() *Event {
 	f.Index = max(f.Index - 1, 0)
 	return f.GetEvent()
 }

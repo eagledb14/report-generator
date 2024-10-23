@@ -7,8 +7,10 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -51,6 +53,13 @@ func NewEventFromItem(item Item) Event {
 	}
 }
 
+func NewIpEvent(ip string) Event {
+	return Event {
+		Ip: ip, 
+		Ports: make(map[int][]Cve),
+	}
+}
+
 func (e *Event) Load() Event {
 	if e.Loaded == true {
 		return *e
@@ -69,12 +78,7 @@ func (e *Event) Load() Event {
 	}(e, bannerChannel)
 
 	banner := <-bannerChannel
-	for _, d := range banner.Data {
-		for name, v := range d.Vulns {
-			cve := NewCve(name, v)
-			e.Ports[d.Port] = append(e.Ports[d.Port], cve)
-		}
-	}
+	e.parseCves(banner)
 
 	e.Loaded = true
 	return *e
@@ -167,6 +171,20 @@ func (e *Event) getBanner(retries int) Banner {
 	return banner
 }
 
+func (e *Event) parseCves(banner Banner) {
+	for _, d := range banner.Data {
+		for name, vuln := range d.Vulns {
+			cve := NewCve(name, vuln)
+			if cve.Rank != 4 {
+				e.Ports[d.Port] = append(e.Ports[d.Port], cve)
+			}
+		}
+		sort.Slice(e.Ports[d.Port], func(i, j int) bool {
+			return e.Ports[d.Port][i].Rank < e.Ports[d.Port][j].Rank
+		})
+	}
+}
+
 type Vuln struct {
 	Cvss   float32 `json:"cvss,omitempty"`
 	CvssV2 float32 `json:"cvss_v2,omitempty"`
@@ -199,7 +217,7 @@ type Rss struct {
 	} `xml:"channel"`
 }
 
-func Download() []Event {
+func DownloadRss() []*Event {
 	cache := NewEventCache()
 
 	apiKey := os.Getenv("API_KEY")
@@ -207,7 +225,7 @@ func Download() []Event {
 
 	if response.StatusCode != http.StatusOK {
 		fmt.Printf("Error: received status code %d\n", response.StatusCode)
-		return []Event{}
+		return []*Event{}
 	}
 	defer response.Body.Close()
 
@@ -216,15 +234,81 @@ func Download() []Event {
 	decoder := xml.NewDecoder(response.Body)
 	decoder.Decode(&rss)
 
-	events := []Event{}
+	events := []*Event{}
 
+	// checks if an event has been seen recently, and if now add it to the list
 	for _, item := range rss.Channel.Item {
 		newEvent := NewEventFromItem(item)
-		if cache.HasEventBeenSeen(newEvent) == false {
-			events = append(events, newEvent)
-			cache.InsertEvent(newEvent)
+		if cache.HasEventBeenSeen(&newEvent) == false {
+			events = append(events, &newEvent)
+			cache.InsertEvent(&newEvent)
 		}
 	}
 
 	return events
+}
+
+type Net struct {
+	Matches []struct {
+		Ip string `json:"ip_str,omitempty"`
+	} `json:"matches,omitempty"`
+}
+
+func DownloadIpList(name string, queries string) []*Event {
+	apiKey := os.Getenv("API_KEY")
+	url :="https://api.shodan.io/shodan/host/search?key=" + apiKey + "&query=net:" + queries 
+	response, err := http.Get(url)
+	if err != nil {
+		return []*Event{}
+	}
+
+	if response.StatusCode != http.StatusOK {
+		fmt.Printf("Error: received status code %d\n", response.StatusCode)
+		return []*Event{}
+	}
+	defer response.Body.Close()
+
+	body, _ := io.ReadAll(response.Body)
+	nets := Net{}
+	json.Unmarshal(body, &nets)
+
+
+	var wg sync.WaitGroup
+	events := []*Event{}
+
+	outer: for _, ip := range nets.Matches {
+		newEvent := NewIpEvent(ip.Ip)
+
+		// make sure there are only unique events in the list
+		for _, e := range events {
+			if e.Ip == newEvent.Ip {
+				continue outer
+			}
+		}
+		events = append(events, &newEvent)
+
+		// loads each event after parsing their ip
+		wg.Add(1)
+		go func(e *Event, wg *sync.WaitGroup) {
+			defer wg.Done()
+
+			banner := e.getBanner(0)
+			e.parseCves(banner)
+			e.Loaded = true
+		}(&newEvent, &wg)
+	}
+	wg.Wait()
+
+	return events
+}
+
+func FilterEvents(events []*Event) []*Event {
+	newEventList := []*Event{}
+	for _, e := range events {
+		if len(e.Ports) > 0 {
+			newEventList = append(newEventList, e)
+		}
+	}
+
+	return newEventList
 }
