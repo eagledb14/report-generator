@@ -18,7 +18,7 @@ func NewFeed() Feed {
 }
 
 func (f *Feed) Next() Event {
-	f.Index = Min(f.Index + 1, len(f.events) - 1)
+	f.Index = min(f.Index + 1, len(f.events) - 1)
 	return f.GetEvent()
 }
 
@@ -31,11 +31,11 @@ func (f *Feed) GetEvent() Event {
 }
 
 func (f *Feed) Prev() Event {
-	f.Index = Max(f.Index - 1, 0)
+	f.Index = max(f.Index - 1, 0)
 	return f.GetEvent()
 }
 
-func Max(a int, b int) int {
+func max(a int, b int) int {
 	if a > b {
 		return a
 	} else {
@@ -43,7 +43,7 @@ func Max(a int, b int) int {
 	}
 }
 
-func Min(a int, b int) int {
+func min(a int, b int) int {
 	if a < b {
 		return a
 	} else {

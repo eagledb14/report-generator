@@ -3,19 +3,23 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/eagledb14/form-scanner/alerts"
-	"github.com/gofiber/fiber/v2"
+
+	// "github.com/eagledb14/form-scanner/alerts"
 	"os"
 	"os/exec"
 	"runtime"
 	"strings"
+
+	createform "github.com/eagledb14/form-scanner/create-form"
+	t "github.com/eagledb14/form-scanner/templates"
+	"github.com/gofiber/fiber/v2"
 )
 
 func main() {
 	// fmt.Println("Hellow Worl")
 	loadEnvVars()
 	// fmt.Println(alerts.Download())
-	ch := make(chan int)
+	// ch := make(chan int)
 	// for _, a := range alerts.Download() {
 	// 	// a.GetName(0)
 	// 	// a.GetAlertId(0)
@@ -26,22 +30,65 @@ func main() {
 	// 	// fmt.Println(a)
 	// 	// beak
 	// }
-	events := alerts.Download()
-	fmt.Println(len(events))
-	<-ch
+	// events := alerts.Download()
+	// fmt.Println(len(events))
+	// <-ch
 	// fmt.Println(os.Getenv("API_KEY"))
 	// alerts.Download()
 
-	// go openBrowser("localhost:8080")
-	// serv(":8080")
+	go openBrowser("localhost:8080")
+	serv(":8080")
 }
 
 func serv(port string) {
 	app := fiber.New()
 	app.Get("/", func(c *fiber.Ctx) error {
 		c.Set("Content-Type", "text/html")
-		return c.SendString("hi")
+		return c.SendString(t.BuildPage(t.CredLeak()))
 	})
+
+	app.Get("/credleak", func(c *fiber.Ctx) error {
+		c.Set("Content-Type", "text/html")
+		return c.SendString(t.BuildPage(t.CredLeak()))
+	})
+
+	app.Post("/credleak", func(c *fiber.Ctx) error {
+		c.Set("Content-Type", "text/html")
+
+		form :=	createform.CredLeak{
+			OrgName:    c.FormValue("orgName"),
+			FormNumber: c.FormValue("formNumber"),
+			VictimOrg:  c.FormValue("victimOrg"),
+			Leaks:      c.FormValue("leaks"),
+			Creds:      c.FormValue("creds"),
+			Password:   c.FormValue("password"),
+			IpAddress:  c.FormValue("ipAddress"),
+			UserPass:   c.FormValue("userPass"),
+			AddInfo:    c.FormValue("addInfo"),
+			Reference:  c.FormValue("reference"),
+			Tlp:        c.FormValue("tlp"),
+		}
+		fmt.Println(form)
+
+		return c.SendString(t.BuildPage(t.Index()))
+	})
+
+	app.Get("/openport", func(c *fiber.Ctx) error {
+		c.Set("Content-Type", "text/html")
+		return c.SendString(t.BuildPage(t.OpenPort()))
+	})
+
+	app.Get("/actor", func(c *fiber.Ctx) error {
+		c.Set("Content-Type", "text/html")
+		return c.SendString(t.BuildPage(t.Actors()))
+	})
+
+	app.Get("/event", func(c *fiber.Ctx) error {
+		c.Set("Content-Type", "text/html")
+		return c.SendString(t.BuildPage(t.Event()))
+	})
+
+	app.Static("/style.css", "./resources/style.css")
 
 	app.Listen(port)
 }
