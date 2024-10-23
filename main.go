@@ -13,6 +13,7 @@ import (
 	"github.com/eagledb14/form-scanner/alerts"
 	createform "github.com/eagledb14/form-scanner/create-form"
 	t "github.com/eagledb14/form-scanner/templates"
+	"github.com/eagledb14/form-scanner/types"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -42,12 +43,13 @@ func main() {
 	// 	fmt.Println(len(e.Ports))
 	// }
 	// fmt.Println(events)
+	state := types.NewState()
 
 	go openBrowser("localhost:8080")
-	serv(":8080")
+	serv(":8080", &state)
 }
 
-func serv(port string) {
+func serv(port string, state *types.State) {
 	app := fiber.New()
 	app.Get("/", func(c *fiber.Ctx) error {
 		c.Set("Content-Type", "text/html")
@@ -83,6 +85,35 @@ func serv(port string) {
 	app.Get("/openport", func(c *fiber.Ctx) error {
 		c.Set("Content-Type", "text/html")
 
+		if len(state.Events) > 0 {
+			return c.SendString(t.BuildPage(t.OpenPortForm(state.Name, state.Events)))
+		}
+
+		return c.SendString(t.BuildPage(t.OpenPortDownload()))
+	})
+
+	//makes a new file
+	app.Post("/openport", func(c *fiber.Ctx) error {
+		c.Set("Content-Type", "text/html")
+		fmt.Println("yay")
+		form := createform.OpenPort {
+			FormNumber: c.FormValue("formNumber"),
+			Threat: c.FormValue("threat"),
+			Summary: c.FormValue("summary"),
+			Body: c.FormValue("body"),
+			Reference: c.FormValue("reference"),
+			Tlp: c.FormValue("tlp"),
+			Events: state.Events,
+		}
+		_ = form
+
+		return c.SendString(t.BuildPage("yay, you made the page, congrats"))
+	})
+
+	// clears the state of the thing
+	app.Put("/openport", func(c *fiber.Ctx) error {
+		state.Events = []*alerts.Event{}
+		state.Name = ""
 		return c.SendString(t.BuildPage(t.OpenPortDownload()))
 	})
 
@@ -92,7 +123,11 @@ func serv(port string) {
 
 		events := alerts.DownloadIpList(name, ips)
 		events = alerts.FilterEvents(events)
-		return c.SendString(t.BuildPage(t.OpenPortForm(name, events)))
+
+		state.Events = events
+		state.Name = name
+
+		return c.SendString(t.BuildPage(t.OpenPortForm(state.Name, state.Events)))
 	})
 
 	app.Get("/actor", func(c *fiber.Ctx) error {

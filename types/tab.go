@@ -1,8 +1,18 @@
 package types
 
+type Page int
+
 const (
-    Actor = iota
+    Actor Page = iota
     CredLeak
     Events
-	OpenPort
+    OpenPort
+)
+
+type Form int
+
+const (
+    Open Form = iota
+    EOL 
+    Login
 )

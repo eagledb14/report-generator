@@ -2,6 +2,7 @@ package templates
 
 import (
 	"github.com/eagledb14/form-scanner/alerts"
+	"github.com/eagledb14/form-scanner/types"
 )
 
 // or I might pass in state to this
@@ -11,23 +12,25 @@ func OpenPortDownload() string {
 
 	const page = `
         <h1>Open Port</h1>
-		<form hx-post="/openportform" hx-target="body">
-			<fieldset>
-                    <label>
-                        Organization Name
-                        <input name="orgName"/>
-                    </label>
-					<label>
-						IP Addresses
-						<input name="ipAddress" />
-					</label>
+		<article>
+			<form hx-post="/openportform" hx-target="body">
+				<fieldset>
+						<label>
+							Organization Name
+							<input name="orgName"/>
+						</label>
+						<label>
+							IP Addresses
+							<input name="ipAddress" />
+						</label>
 
-					<div class="grid">
-						<input type="submit">
-						<input type="reset">
-					</div>
-			</fieldset>
-		</form>
+						<div class="grid">
+							<input type="submit">
+							<input type="reset">
+						</div>
+				</fieldset>
+			</form>
+		</article>
         `
 
 	return Execute("openport", page, data)
@@ -41,11 +44,11 @@ func OpenPortForm(name string, e []*alerts.Event) string {
 	}{
 		Name: name,
 		Events: e,
-		Form: "<div>I'm going to put the function from the other thing here</div>",
+		Form: form(types.Open, e),
 	}
 
 	const page = `
-		<button hx-get="/openport" hx-target="body"><</button>
+		<button hx-put="/openport" hx-target="body"><</button>
         <h1>{{.Name}}</h1>
 		{{range .Events}}
 			<article>

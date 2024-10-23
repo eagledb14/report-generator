@@ -5,6 +5,11 @@ import (
 )
 
 type State struct {
-    feed alerts.Feed
-    event []*alerts.Event
+    Feed alerts.Feed
+    Events []*alerts.Event
+    Name string
+}
+
+func NewState() State {
+    return State{}
 }
