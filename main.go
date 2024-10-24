@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
+	"strconv"
 
 	"github.com/eagledb14/form-scanner/alerts"
 	createform "github.com/eagledb14/form-scanner/create-form"
@@ -53,12 +54,12 @@ func serv(port string, state *types.State) {
 	app := fiber.New()
 	app.Get("/", func(c *fiber.Ctx) error {
 		c.Set("Content-Type", "text/html")
-		return c.SendString(t.BuildPage(t.CredLeak()))
+		return c.SendString(t.BuildPage(t.CredLeak(), state))
 	})
 
 	app.Get("/credleak", func(c *fiber.Ctx) error {
 		c.Set("Content-Type", "text/html")
-		return c.SendString(t.BuildPage(t.CredLeak()))
+		return c.SendString(t.BuildPage(t.CredLeak(), state))
 	})
 
 	app.Post("/credleak", func(c *fiber.Ctx) error {
@@ -79,17 +80,17 @@ func serv(port string, state *types.State) {
 		}
 		_ = form
 
-		return c.SendString(t.BuildPage(t.Index()))
+		return c.SendString(t.BuildPage(t.Index(), state))
 	})
 
 	app.Get("/openport", func(c *fiber.Ctx) error {
 		c.Set("Content-Type", "text/html")
 
 		if len(state.Events) > 0 {
-			return c.SendString(t.BuildPage(t.OpenPortForm(state.Name, state.Events)))
+			return c.SendString(t.BuildPage(t.OpenPortForm(types.Open, state.Name, state.Events), state))
 		}
 
-		return c.SendString(t.BuildPage(t.OpenPortDownload()))
+		return c.SendString(t.BuildPage(t.OpenPortDownload(), state))
 	})
 
 	//makes a new file
@@ -107,17 +108,17 @@ func serv(port string, state *types.State) {
 		}
 		_ = form
 
-		return c.SendString(t.BuildPage("yay, you made the page, congrats"))
+		return c.SendString(t.BuildPage("yay, you made the page, congrats", state))
 	})
 
 	// clears the state of the thing
 	app.Put("/openport", func(c *fiber.Ctx) error {
 		state.Events = []*alerts.Event{}
 		state.Name = ""
-		return c.SendString(t.BuildPage(t.OpenPortDownload()))
+		return c.SendString(t.BuildPage(t.OpenPortDownload(), state))
 	})
 
-	app.Post("/openportform", func(c *fiber.Ctx) error {
+	app.Post("/openport/form", func(c *fiber.Ctx) error {
 		name := c.FormValue("orgName")
 		ips := c.FormValue("ipAddress")
 
@@ -127,17 +128,102 @@ func serv(port string, state *types.State) {
 		state.Events = events
 		state.Name = name
 
-		return c.SendString(t.BuildPage(t.OpenPortForm(state.Name, state.Events)))
+		return c.SendString(t.BuildPage(t.OpenPortForm(types.Open, state.Name, state.Events), state))
+	})
+
+	app.Get("/openport/port", func(c *fiber.Ctx) error {
+		state.FormType = types.Open
+		return c.SendString(t.BuildPage(t.OpenPortForm(types.Open, state.Name, state.Events), state))
+	})
+
+	app.Get("/openport/eol", func(c *fiber.Ctx) error {
+		state.FormType = types.EOL
+		return c.SendString(t.BuildPage(t.OpenPortForm(types.EOL, state.Name, state.Events), state))
+	})
+
+	app.Get("/openport/login", func(c *fiber.Ctx) error {
+		state.FormType = types.Login
+		return c.SendString(t.BuildPage(t.OpenPortForm(types.Login, state.Name, state.Events), state))
 	})
 
 	app.Get("/actor", func(c *fiber.Ctx) error {
 		c.Set("Content-Type", "text/html")
-		return c.SendString(t.BuildPage(t.Actors()))
+		return c.SendString(t.BuildPage(t.Actors(), state))
 	})
 
-	app.Get("/event", func(c *fiber.Ctx) error {
+	app.Get("/event/page/:index", func(c *fiber.Ctx) error {
 		c.Set("Content-Type", "text/html")
-		return c.SendString(t.BuildPage(t.Event()))
+
+
+		indexParam := c.Params("index")
+    
+		index, err := strconv.Atoi(indexParam)
+		if err != nil || index < 0 {
+			index = 0
+		}
+
+		if index >= len(state.FeedEvents) / 10 {
+			index = ((len(state.FeedEvents) / 10) / 2) * 2
+		}
+
+		state.EventIndex = index
+
+		return c.SendString(t.BuildPage(t.EventList(state.FeedEvents, index), state))
+	})
+
+	app.Get("/event/open/:index", func(c *fiber.Ctx) error {
+		indexParam := c.Params("index")
+    
+		index, err := strconv.Atoi(indexParam)
+		if err != nil || index < 0 || index >= len(state.FeedEvents) {
+			return c.SendStatus(fiber.StatusBadRequest)
+		}
+		state.FormType = types.Open
+
+		event := state.GetFeedEvent(index)
+		return c.SendString(t.BuildPage(t.EventView(event, index, types.Open, state.EventIndex), state))
+	})
+
+	app.Get("/event/eol/:index", func(c *fiber.Ctx) error {
+		indexParam := c.Params("index")
+    
+		index, err := strconv.Atoi(indexParam)
+		if err != nil || index < 0 || index >= len(state.FeedEvents) {
+			return c.SendStatus(fiber.StatusBadRequest)
+		}
+		state.FormType = types.Open
+
+		event := state.GetFeedEvent(index)
+		return c.SendString(t.BuildPage(t.EventView(event, index, types.EOL, state.EventIndex), state))
+	})
+
+	app.Get("/event/login/:index", func(c *fiber.Ctx) error {
+		indexParam := c.Params("index")
+    
+		index, err := strconv.Atoi(indexParam)
+		if err != nil || index < 0 || index >= len(state.FeedEvents) {
+			return c.SendStatus(fiber.StatusBadRequest)
+		}
+
+		state.FormType = types.Open
+
+		event := state.GetFeedEvent(index)
+		return c.SendString(t.BuildPage(t.EventView(event, index, types.Login, state.EventIndex), state))
+	})
+
+	app.Get("/event/:index", func(c *fiber.Ctx) error {
+		c.Set("Content-Type", "text/html")
+
+		indexParam := c.Params("index")
+    
+		index, err := strconv.Atoi(indexParam)
+		if err != nil || index < 0 || index >= len(state.FeedEvents) {
+			return c.SendStatus(fiber.StatusBadRequest)
+		}
+		state.FormType = types.Open
+
+		event := state.GetFeedEvent(index)
+		return c.SendString(t.BuildPage(t.EventView(event, index, types.Open, state.EventIndex), state))
 	})
 
 	app.Static("/style.css", "./resources/style.css")

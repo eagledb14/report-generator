@@ -94,7 +94,7 @@ func CredLeak() string {
 					<hr>
 					
 					<div class="grid">
-						<input type="submit">
+						<input type="submit" value="Submit">
 						<input type="reset">
 					</div>
 					

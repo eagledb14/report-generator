@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"html/template"
 	text "text/template"
+
+	"github.com/eagledb14/form-scanner/types"
 )
 
 func Execute(name string, t string, data interface{}) string {
@@ -37,19 +39,26 @@ func ExecuteText(name string, t string, data interface{}) string {
 	return b.String()
 }
 
-func Banner() string {
-	return `
+func Banner(state *types.State) string {
+	data :=	struct {
+		EventIndex int
+	} {
+		EventIndex: state.EventIndex,
+	}
+
+	const page =  `
         <div class="heading">
             <nav style="margin: 0px 10px">
                     <ul>
                             <li><a href="/credleak"><kbd>Cred Leak</kbd></a></li>
                             <li><a href="/openport"><kbd>Open Port</kbd></a></li>
                             <li><a href="/actor"><kbd>Actor</kbd></a></li>
-                            <li><a href="/event"><kbd>Event</kbd></a></li>
+                            <li><a href="/event/page/{{.EventIndex}}"><kbd>Event</kbd></a></li>
                     </ul>
             </nav>
         </div>
     `
+	return Execute("banner", page, data)
 }
 
 func header() string {
@@ -64,7 +73,7 @@ func header() string {
         `
 }
 
-func BuildPage(body string) string {
+func BuildPage(body string, state *types.State) string {
 	data := struct {
 		Header string
 		Body   string
@@ -72,7 +81,7 @@ func BuildPage(body string) string {
 	}{
 		Header: header(),
 		Body:   body,
-		Banner: Banner(),
+		Banner: Banner(state),
 	}
 
 	const page = `

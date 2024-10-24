@@ -46,7 +46,7 @@ func NewEventFromItem(item Item) Event {
 		TriggerPort: port,
 		AlertLink:   item.Link,
 		HostLink:    "https://www.shodan.io/host/" + ip,
-		Desc:        item.Description + " on port " + string(port),
+		Desc:        item.Description + " on port " + strconv.Itoa(port),
 		Timestamp:   timestamp,
 		Ports:       make(map[int][]Cve),
 		Loaded:      false,
@@ -172,12 +172,15 @@ func (e *Event) getBanner(retries int) Banner {
 }
 
 func (e *Event) parseCves(banner Banner) {
+	for _, p := range banner.Ports {
+		e.Ports[p] = []Cve{}
+	}
 	for _, d := range banner.Data {
 		for name, vuln := range d.Vulns {
 			cve := NewCve(name, vuln)
-			if cve.Rank != 4 {
+			// if cve.Rank != 4 {
 				e.Ports[d.Port] = append(e.Ports[d.Port], cve)
-			}
+			// }
 		}
 		sort.Slice(e.Ports[d.Port], func(i, j int) bool {
 			return e.Ports[d.Port][i].Rank < e.Ports[d.Port][j].Rank
@@ -198,6 +201,7 @@ type Banner struct {
 		Vulns   map[string]Vuln `json:"vulns,omitempty"`
 		Product string          `json:"product,omitempty"`
 	} `json:"data"`
+	Ports []int `json:"ports"`
 }
 
 type Item struct {
@@ -241,7 +245,7 @@ func DownloadRss() []*Event {
 		newEvent := NewEventFromItem(item)
 		if cache.HasEventBeenSeen(&newEvent) == false {
 			events = append(events, &newEvent)
-			cache.InsertEvent(&newEvent)
+			// cache.InsertEvent(&newEvent)
 		}
 	}
 
@@ -302,6 +306,7 @@ func DownloadIpList(name string, queries string) []*Event {
 	return events
 }
 
+// filters events that have no ports available
 func FilterEvents(events []*Event) []*Event {
 	newEventList := []*Event{}
 	for _, e := range events {

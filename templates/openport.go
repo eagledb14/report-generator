@@ -13,7 +13,7 @@ func OpenPortDownload() string {
 	const page = `
         <h1>Open Port</h1>
 		<article>
-			<form hx-post="/openportform" hx-target="body">
+			<form hx-post="/openport/form" hx-target="body" hx-indicator="#load">
 				<fieldset>
 						<label>
 							Organization Name
@@ -24,9 +24,10 @@ func OpenPortDownload() string {
 							<input name="ipAddress" />
 						</label>
 
+						<div id="load" class="htmx-indicator center" aria-busy="true">Loading...</div>
 						<div class="grid">
-							<input type="submit">
-							<input type="reset">
+							<input type="submit" value="Submit"/>
+							<input type="reset"/>
 						</div>
 				</fieldset>
 			</form>
@@ -36,15 +37,17 @@ func OpenPortDownload() string {
 	return Execute("openport", page, data)
 }
 
-func OpenPortForm(name string, e []*alerts.Event) string {
+func OpenPortForm(form types.Form, name string, e []*alerts.Event) string {
 	data := struct {
 		Name string
 		Events []*alerts.Event
 		Form string
+		FormName string
 	}{
 		Name: name,
 		Events: e,
-		Form: form(types.Open, e),
+		Form: getForm(form, name, e),
+		FormName: types.FormName[form],
 	}
 
 	const page = `
@@ -52,7 +55,14 @@ func OpenPortForm(name string, e []*alerts.Event) string {
         <h1>{{.Name}}</h1>
 		{{range .Events}}
 			<article>
-				<header><h3>{{.Ip}}<h3></header>
+				<header>
+					<h3>{{.Ip}}<h3> 
+					<br>
+					<small><a href="{{.HostLink}}" target=_blank>Host Link</a></small>
+				</header>
+				{{if eq (len .Ports) 0}}
+					<h4> No Available Information</h4>
+				{{end}}
 				{{range $key, $value := .Ports}}
 					<h4>{{$key}}</h4>
 					{{range $value}}
@@ -63,8 +73,14 @@ func OpenPortForm(name string, e []*alerts.Event) string {
 				{{end}}
 			</article>
 		{{end}}
+		<hr>
+		<div class="grid">
+			<button hx-get="/openport/port" hx-target="body">Open Port</button>
+			<button hx-get="/openport/eol" hx-target="body">End of Life</button>
+			<button hx-get="/openport/login" hx-target="body">Login Pages</button>
+		</div>
+		<h3>{{$.FormName}}</h3>
 		{{.Form}}
-
         `
 
 	return ExecuteText("openport", page, data)
