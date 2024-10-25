@@ -178,9 +178,9 @@ func (e *Event) parseCves(banner Banner) {
 	for _, d := range banner.Data {
 		for name, vuln := range d.Vulns {
 			cve := NewCve(name, vuln)
-			// if cve.Rank != 4 {
+			if cve.Rank != 4 {
 				e.Ports[d.Port] = append(e.Ports[d.Port], cve)
-			// }
+			}
 		}
 		sort.Slice(e.Ports[d.Port], func(i, j int) bool {
 			return e.Ports[d.Port][i].Rank < e.Ports[d.Port][j].Rank
