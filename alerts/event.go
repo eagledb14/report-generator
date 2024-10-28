@@ -245,7 +245,7 @@ func DownloadRss() []*Event {
 		newEvent := NewEventFromItem(item)
 		if cache.HasEventBeenSeen(&newEvent) == false {
 			events = append(events, &newEvent)
-			// cache.InsertEvent(&newEvent)
+			cache.InsertEvent(&newEvent)
 		}
 	}
 

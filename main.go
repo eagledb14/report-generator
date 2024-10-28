@@ -80,7 +80,7 @@ func serv(port string, state *types.State) {
 		}
 		_ = form
 
-		return c.SendString(t.BuildPage(t.Index(), state))
+		return c.SendString(t.BuildPage("yay, you made the page, congrats", state))
 	})
 
 	app.Get("/openport", func(c *fiber.Ctx) error {
@@ -249,6 +249,22 @@ func serv(port string, state *types.State) {
 		return c.SendString(t.BuildPage(t.EventView(event, index, types.Open, state.EventIndex), state))
 	})
 
+	app.Post("/event", func(c *fiber.Ctx) error {
+		c.Set("Content-Type", "text/html")
+		form := createform.OpenPort{
+			FormNumber: c.FormValue("formNumber"),
+			Threat:     c.FormValue("threat"),
+			Summary:    c.FormValue("summary"),
+			Body:       c.FormValue("body"),
+			Reference:  c.FormValue("reference"),
+			Tlp:        c.FormValue("tlp"),
+			Events:     state.Events,
+		}
+		_ = form
+
+		return c.SendString(t.BuildPage("yay, you made the page, congrats", state))
+	})
+
 	app.Static("/style.css", "./resources/style.css")
 
 	app.Listen(port)
@@ -273,10 +289,10 @@ func openBrowser(url string) {
 	}
 }
 
-func loadEnvVars() error {
+func loadEnvVars() {
 	file, err := os.Open("./resources/key.env")
 	if err != nil {
-		return fmt.Errorf("error opening file: %v", err)
+		panic("error opening file")
 	}
 	defer file.Close()
 
@@ -290,20 +306,18 @@ func loadEnvVars() error {
 
 		parts := strings.SplitN(line, "=", 2)
 		if len(parts) != 2 {
-			return fmt.Errorf("invalid line format: %s", line)
+			panic("invalid line format")
 		}
 
 		key := strings.TrimSpace(parts[0])
 		value := strings.TrimSpace(parts[1])
 
 		if err := os.Setenv(key, value); err != nil {
-			return fmt.Errorf("error setting env var %s: %v", key, err)
+			panic("error setting env var")
 		}
 	}
 
 	if err := scanner.Err(); err != nil {
-		return fmt.Errorf("error reading file: %v", err)
+		panic("error reading file")
 	}
-
-	return nil
 }

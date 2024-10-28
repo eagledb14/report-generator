@@ -8,7 +8,7 @@ import (
 )
 
 
-func getForm(formType types.Form, name string, events []*alerts.Event) string {
+func getForm(formType types.Form, name string, events []*alerts.Event, endpoint string) string {
 	summary := ""
 	body := ""
 
@@ -31,14 +31,16 @@ func getForm(formType types.Form, name string, events []*alerts.Event) string {
 	data := struct {
 		Summary string
 		Body string
+		Endpoint string
 	} {
 		Summary: summary,
 		Body: body,
+		Endpoint: endpoint,
 	}
 
 	const page = `
 	<article>
-		<form hx-post="" hx-target="body">
+		<form hx-post="{{.Endpoint}}" hx-target="body">
 			<fieldset>
                     <label>
                         Form Number

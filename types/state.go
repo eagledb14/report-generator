@@ -11,6 +11,7 @@ type State struct {
     Name string
     FormType Form
     EventIndex int
+    Markdown string
 }
 
 func NewState() State {
@@ -29,5 +30,11 @@ func NewState() State {
 }
 
 func (e *State) GetFeedEvent(index int) *alerts.Event {
+    if index < 0 {
+	index = 0
+    } else if index >= len(e.FeedEvents) {
+	index = len(e.FeedEvents) - 1
+    }
+
     return e.FeedEvents[index + (e.EventIndex * 10)]
 }

@@ -46,7 +46,7 @@ func OpenPortForm(form types.Form, name string, e []*alerts.Event) string {
 	}{
 		Name: name,
 		Events: e,
-		Form: getForm(form, name, e),
+		Form: getForm(form, name, e, "/openport"),
 		FormName: types.FormName[form],
 	}
 
@@ -56,7 +56,7 @@ func OpenPortForm(form types.Form, name string, e []*alerts.Event) string {
 		{{range .Events}}
 			<article>
 				<header>
-					<h3>{{.Ip}}<h3> 
+					<h3>{{.Ip}}</h3> 
 					<br>
 					<small><a href="{{.HostLink}}" target=_blank>Host Link</a></small>
 				</header>
