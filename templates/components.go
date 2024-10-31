@@ -54,6 +54,7 @@ func Banner(state *types.State) string {
                             <li><a href="/openport"><kbd>Open Port</kbd></a></li>
                             <li><a href="/actor"><kbd>Actor</kbd></a></li>
                             <li><a href="/event/page/{{.EventIndex}}"><kbd>Event</kbd></a></li>
+                            <li><a href="/preview"><kbd>Preview</kbd></a></li>
                     </ul>
             </nav>
         </div>

@@ -12,7 +12,7 @@ build-all:
 	GOOS=windows GOARCH=amd64 go build -o shodan-form.exe .
 
 run: 
-	go run .
+	@go run .
 
 clean:
 	rm shodan-form*

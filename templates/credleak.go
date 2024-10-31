@@ -14,7 +14,7 @@ func CredLeak() string {
     const page = `
         <h1>Cred Leak</h1>
 		<article>
-			<form hx-post="/credleak" hx-target="body">
+			<form hx-post="/credleak" hx-target="body" hx-push-url="/preview">
 				<fieldset>
 					<div class="grid">
 						<label>
@@ -31,16 +31,6 @@ func CredLeak() string {
 						<input name="victimOrg"/>
 					</label>
 
-					<label>
-						<input type="checkbox" name="leaks"/>
-						Multiple Leaks Found
-					</label>
-
-					<label>
-						<input type="checkbox" name="creds"/>
-						Multiple Creadentials
-					</label>
-					
 					<hr>
 					<label>For password add either:</label>
 					<label>
@@ -61,11 +51,6 @@ func CredLeak() string {
 					</label>
 					<hr>
 
-					<label>
-						IP Address
-						<input name="ipAddress" />
-					</label>
-					
 					<label>
 						Insert Username: Password
 						<textarea name="userPass"></textarea>

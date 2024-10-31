@@ -40,7 +40,7 @@ func getForm(formType types.Form, name string, events []*alerts.Event, endpoint 
 
 	const page = `
 	<article>
-		<form hx-post="{{.Endpoint}}" hx-target="body">
+		<form hx-post="{{.Endpoint}}" hx-target="body" hx-push-url="/preview">
 			<fieldset>
                     <label>
                         Form Number
@@ -79,7 +79,7 @@ func getForm(formType types.Form, name string, events []*alerts.Event, endpoint 
 
 					<hr>
 					<div class="grid">
-						<input type="submit" value="Submit" onclick="window.scrollTo(0, 0);">
+						<input type="submit" value="Submit" onclick="window.scrollTo(0, 0);" hx->
 						<input type="reset">
 					</div>
 			</fieldset>

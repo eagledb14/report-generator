@@ -1,6 +1,8 @@
 package templates
 
 import (
+	"strconv"
+
 	"github.com/eagledb14/form-scanner/alerts"
 	"github.com/eagledb14/form-scanner/types"
 )
@@ -21,6 +23,9 @@ func EventList(events []*alerts.Event, index int) string {
 
     const page = `
 	<h1>Event: {{.EventIndex}}</h1>
+	{{if eq (len .Events) 0}}
+	<h2>No New Events</h2>
+	{{end}}
 	{{range $index, $event := .Events}}
 		<article>
 			<header>{{$event.Name}}</header>
@@ -56,7 +61,7 @@ func EventView(event *alerts.Event, index int, form types.Form, eventPage int) s
 		Event: event,
 		EventPage: eventPage,
 		EventIndex: index,
-		Form: getForm(form, event.Name, []*alerts.Event{event}, "/event"),
+		Form: getForm(form, event.Name, []*alerts.Event{event}, "/event/" + strconv.Itoa(index)),
 		FormName: types.FormName[form], 
 	}
 

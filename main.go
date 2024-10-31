@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"fmt"
 
+	// "sync"
+
 	// "github.com/eagledb14/form-scanner/alerts"
 	"os"
 	"os/exec"
@@ -19,31 +21,35 @@ import (
 )
 
 func main() {
-	// fmt.Println("Hellow Worl")
 	loadEnvVars()
-	// fmt.Println(alerts.Download())
-	// ch := make(chan int)
-	// for _, a := range alerts.Download() {
-	// 	// a.GetName(0)
-	// 	// a.GetAlertId(0)
-	// 	// a.GetName(0)
-	// 	// fmt.Println(a.Name)
-	//
-	// 	go a.Load()
-	// 	// fmt.Println(a)
-	// 	// beak
-	// }
-	// events := alerts.Download()
-	// fmt.Println(len(events))
-	// <-ch
-	// fmt.Println(os.Getenv("API_KEY"))
-	// alerts.Download()
-	// events := alerts.DownloadIpList("monkey", "24.246.129.0/24")
-	// fmt.Println(len(events))
+	// events := alerts.DownloadRss()
+	// wg := sync.WaitGroup{}
 	// for _, e := range events {
-	// 	fmt.Println(len(e.Ports))
+	// 	wg.Add(1)
+	// 	go func(e *alerts.Event, wg *sync.WaitGroup) {
+	// 		e.Load()
+	// 		wg.Done()
+	// 	}(e, &wg)
 	// }
-	// fmt.Println(events)
+	// wg.Wait()
+	//
+	// form := createform.OpenPort{
+	// 	OrgName: "Test Title",
+	// 	FormNumber: "1",
+	// 	Threat: "2",
+	// 	Summary: "hias fsealksjdfa;sdjf askdfj",
+	// 	Body: "aksjdflkajsdf alksjdf",
+	// 	Tlp: false,
+	// 	Reference: "",
+	// 	// Events: alerts.DownloadIpList("Testing thing", "24.172.113.143"),
+	// 	Events: events, 
+	// }
+	// 
+	// fmd := form.CreateMarkdown()
+	// createform.CreateHtml(fmd, "Threat Intel Summary")
+	// createform.CreateHtml(createform.Header("threat summary", true))
+	
+	
 	state := types.NewState()
 
 	go openBrowser("localhost:8080")
@@ -69,18 +75,16 @@ func serv(port string, state *types.State) {
 			OrgName:    c.FormValue("orgName"),
 			FormNumber: c.FormValue("formNumber"),
 			VictimOrg:  c.FormValue("victimOrg"),
-			Leaks:      c.FormValue("leaks"),
-			Creds:      c.FormValue("creds"),
 			Password:   c.FormValue("password"),
-			IpAddress:  c.FormValue("ipAddress"),
 			UserPass:   c.FormValue("userPass"),
 			AddInfo:    c.FormValue("addInfo"),
 			Reference:  c.FormValue("reference"),
-			Tlp:        c.FormValue("tlp"),
+			Tlp:        c.FormValue("tlp") == "amber",
 		}
-		_ = form
+		state.Markdown = form.CreateMarkdown(state)
+		state.Name = strings.Clone(form.OrgName)
 
-		return c.SendString(t.BuildPage("yay, you made the page, congrats", state))
+		return c.Redirect("/preview")
 	})
 
 	app.Get("/openport", func(c *fiber.Ctx) error {
@@ -97,17 +101,18 @@ func serv(port string, state *types.State) {
 	app.Post("/openport", func(c *fiber.Ctx) error {
 		c.Set("Content-Type", "text/html")
 		form := createform.OpenPort{
+			OrgName: state.Name,
 			FormNumber: c.FormValue("formNumber"),
 			Threat:     c.FormValue("threat"),
 			Summary:    c.FormValue("summary"),
 			Body:       c.FormValue("body"),
 			Reference:  c.FormValue("reference"),
-			Tlp:        c.FormValue("tlp"),
+			Tlp:        c.FormValue("tlp") == "amber",
 			Events:     state.Events,
 		}
-		_ = form
+		state.Markdown = form.CreateMarkdown(state)
 
-		return c.SendString(t.BuildPage("yay, you made the page, congrats", state))
+		return c.Redirect("/preview")
 	})
 
 	// clears the state of the thing
@@ -125,23 +130,24 @@ func serv(port string, state *types.State) {
 		events = alerts.FilterEvents(events)
 
 		state.Events = events
-		state.Name = name
+		state.Name = strings.Clone(name)
+		// state.SetName(strings.Clone(name), "post openport/form")
 
 		return c.SendString(t.BuildPage(t.OpenPortForm(types.Open, state.Name, state.Events), state))
 	})
 
 	app.Get("/openport/port", func(c *fiber.Ctx) error {
-		state.FormType = types.Open
+		// state.FormType = types.Open
 		return c.SendString(t.BuildPage(t.OpenPortForm(types.Open, state.Name, state.Events), state))
 	})
 
 	app.Get("/openport/eol", func(c *fiber.Ctx) error {
-		state.FormType = types.EOL
+		// state.FormType = types.EOL
 		return c.SendString(t.BuildPage(t.OpenPortForm(types.EOL, state.Name, state.Events), state))
 	})
 
 	app.Get("/openport/login", func(c *fiber.Ctx) error {
-		state.FormType = types.Login
+		// state.FormType = types.Login
 		return c.SendString(t.BuildPage(t.OpenPortForm(types.Login, state.Name, state.Events), state))
 	})
 
@@ -170,9 +176,10 @@ func serv(port string, state *types.State) {
 			Ttps:         c.FormValue("ttps"),
 			Infra:        c.FormValue("infra"),
 		}
-		_ = form
+		state.Name = strings.Clone(form.Name)
+		// state.SetName(strings.Clone(form.Name), "post /actor")
 
-		return c.SendString(t.BuildPage("yay, you made the page, congrats", state))
+		return c.Redirect("/preview")
 	})
 
 	app.Get("/event/page/:index", func(c *fiber.Ctx) error {
@@ -201,7 +208,6 @@ func serv(port string, state *types.State) {
 		if err != nil || index < 0 || index >= len(state.FeedEvents) {
 			return c.SendStatus(fiber.StatusBadRequest)
 		}
-		state.FormType = types.Open
 
 		event := state.GetFeedEvent(index)
 		return c.SendString(t.BuildPage(t.EventView(event, index, types.Open, state.EventIndex), state))
@@ -214,7 +220,7 @@ func serv(port string, state *types.State) {
 		if err != nil || index < 0 || index >= len(state.FeedEvents) {
 			return c.SendStatus(fiber.StatusBadRequest)
 		}
-		state.FormType = types.Open
+		// state.FormType = types.Open
 
 		event := state.GetFeedEvent(index)
 		return c.SendString(t.BuildPage(t.EventView(event, index, types.EOL, state.EventIndex), state))
@@ -227,8 +233,6 @@ func serv(port string, state *types.State) {
 		if err != nil || index < 0 || index >= len(state.FeedEvents) {
 			return c.SendStatus(fiber.StatusBadRequest)
 		}
-
-		state.FormType = types.Open
 
 		event := state.GetFeedEvent(index)
 		return c.SendString(t.BuildPage(t.EventView(event, index, types.Login, state.EventIndex), state))
@@ -243,26 +247,55 @@ func serv(port string, state *types.State) {
 		if err != nil || index < 0 || index >= len(state.FeedEvents) {
 			return c.SendStatus(fiber.StatusBadRequest)
 		}
-		state.FormType = types.Open
+		// state.FormType = types.Open
 
 		event := state.GetFeedEvent(index)
 		return c.SendString(t.BuildPage(t.EventView(event, index, types.Open, state.EventIndex), state))
 	})
 
-	app.Post("/event", func(c *fiber.Ctx) error {
+	app.Post("/event/:index", func(c *fiber.Ctx) error {
 		c.Set("Content-Type", "text/html")
+
+		indexParam := c.Params("index")
+
+		index, err := strconv.Atoi(indexParam)
+		if err != nil || index < 0 || index >= len(state.FeedEvents) {
+			return c.SendStatus(fiber.StatusBadRequest)
+		}
 		form := createform.OpenPort{
+			OrgName: state.FeedEvents[index].Name,
 			FormNumber: c.FormValue("formNumber"),
 			Threat:     c.FormValue("threat"),
 			Summary:    c.FormValue("summary"),
 			Body:       c.FormValue("body"),
 			Reference:  c.FormValue("reference"),
-			Tlp:        c.FormValue("tlp"),
-			Events:     state.Events,
+			Tlp:        c.FormValue("tlp") == "amber",
+			Events:     []*alerts.Event{state.FeedEvents[index]},
 		}
-		_ = form
+		state.Markdown = form.CreateMarkdown(state)
+		state.Name = strings.Clone(form.OrgName)
 
-		return c.SendString(t.BuildPage("yay, you made the page, congrats", state))
+		return c.Redirect("/preview")
+	})
+
+	app.Get("/preview", func(c *fiber.Ctx) error {
+		c.Set("Content-Type", "text/html")
+
+		return c.SendString(t.BuildPage(t.MarkdownViewer(state), state))
+	})
+
+	app.Post("/preview", func(c *fiber.Ctx) error {
+		md := c.FormValue("markdown")
+		state.Markdown = md
+
+		return c.SendStatus(fiber.StatusOK)
+	})
+
+	app.Get("/create", func(c *fiber.Ctx) error {
+		c.Set("Content-Disposition", "attachment; filename=\"" + state.Name + "-" + state.AlertId +".html\"")
+
+		form := createform.CreateHtml(state.Markdown, "Threat Intel Summary")
+		return c.SendString(form)
 	})
 
 	app.Static("/style.css", "./resources/style.css")

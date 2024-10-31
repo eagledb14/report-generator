@@ -56,6 +56,7 @@ func NewEventFromItem(item Item) Event {
 func NewIpEvent(ip string) Event {
 	return Event {
 		Ip: ip, 
+		HostLink:    "https://www.shodan.io/host/" + ip,
 		Ports: make(map[int][]Cve),
 	}
 }

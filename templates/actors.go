@@ -14,7 +14,7 @@ func Actors() string {
     const page = `
         <h1>Actor</h1>
 		<article>
-			<form hx-post="/actor" hx-target="body">
+			<form hx-post="/actor" hx-target="body" hx-push-url="/preview">
 				<fieldset>
 					<label>
 						Primary Name

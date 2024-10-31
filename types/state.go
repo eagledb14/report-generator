@@ -2,6 +2,7 @@ package types
 
 import (
 	"time"
+
 	"github.com/eagledb14/form-scanner/alerts"
 )
 
@@ -12,6 +13,7 @@ type State struct {
     FormType Form
     EventIndex int
     Markdown string
+    AlertId string
 }
 
 func NewState() State {
