@@ -15,11 +15,11 @@ func getForm(formType types.Form, name string, events []*alerts.Event, endpoint 
 	// make a match on which type is passed int
 	switch formType {
 	case types.Open:
-		summary = openPortSummary(name, events)
-		body = openPortBody(name, events)
+		summary = OpenPortSummary(name, events)
+		body = OpenPortBody(name, events)
 	case types.EOL:
 		summary = endOfLifeSummary(name, events)
-		body = openPortBody(name, events)
+		body = OpenPortBody(name, events)
 	case types.Login:
 		summary = loginPageSummary(name)
 		body = loginPageBody(name, events)
@@ -90,7 +90,7 @@ func getForm(formType types.Form, name string, events []*alerts.Event, endpoint 
 	return Execute("form", page, data)
 }
 
-func openPortSummary(name string, events []*alerts.Event) string {
+func OpenPortSummary(name string, events []*alerts.Event) string {
 	cves := false
 	outer: for _, e := range events {
 		for _, cve := range e.Ports {
@@ -108,7 +108,7 @@ func openPortSummary(name string, events []*alerts.Event) string {
     }
 }
 
-func openPortBody(name string, events []*alerts.Event) string {
+func OpenPortBody(name string, events []*alerts.Event) string {
 	ips := strings.Builder{}
 
 	for _, e := range events {

@@ -11,6 +11,9 @@ build-all:
 	GOOS=linux GOARCH=amd64 go build -o shodan-form .
 	GOOS=windows GOARCH=amd64 go build -o shodan-form.exe .
 
+auto:
+	@go run . -auto
+
 run: 
 	@go run .
 

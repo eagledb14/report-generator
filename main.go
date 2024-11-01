@@ -2,20 +2,29 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
-	"github.com/eagledb14/form-scanner/types"
 	"os"
 	"os/exec"
 	"runtime"
 	"strings"
+
+	"github.com/eagledb14/form-scanner/types"
 )
 
 func main() {
 	loadEnvVars()
 
-	state := types.NewState()
-	go openBrowser("localhost:8080")
-	serv(":8080", &state)
+	auto := flag.Bool("auto", false, "run in automatic mode")
+	flag.Parse()
+
+	if *auto {
+		autoCreateEventFiles()
+	} else {
+		state := types.NewState()
+		go openBrowser("localhost:8080")
+		serv(":8080", &state)
+	}
 }
 
 func openBrowser(url string) {

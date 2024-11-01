@@ -5,7 +5,6 @@ import (
 	"github.com/eagledb14/form-scanner/types"
 )
 
-// or I might pass in state to this
 func OpenPortDownload() string {
 	data := struct {
 	}{}
