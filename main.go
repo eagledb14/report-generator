@@ -4,9 +4,11 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"net"
 	"os"
 	"os/exec"
 	"runtime"
+	"strconv"
 	"strings"
 
 	"github.com/eagledb14/form-scanner/types"
@@ -22,8 +24,13 @@ func main() {
 		autoCreateEventFiles()
 	} else {
 		state := types.NewState()
-		go openBrowser("localhost:8080")
-		serv(":8080", &state)
+		port, err := getRandomPort()
+		if err != nil {
+			panic(err)
+		}
+
+		go openBrowser("localhost" + port)
+		serv(port, &state)
 	}
 }
 
@@ -77,4 +84,14 @@ func loadEnvVars() {
 	if err := scanner.Err(); err != nil {
 		panic("error reading file")
 	}
+}
+
+func getRandomPort() (string, error) {
+	listener, err := net.Listen("tcp", "localhost:0")
+	if err != nil {
+		return "", err
+	}
+	defer listener.Close()
+	addr := listener.Addr().(*net.TCPAddr)
+	return ":" + strconv.Itoa(addr.Port), nil
 }
