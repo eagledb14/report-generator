@@ -50,11 +50,21 @@ func Banner(state *types.State) string {
         <div class="heading">
             <nav style="margin: 0px 10px">
                     <ul>
-                            <li><a href="/credleak"><kbd>Cred Leak</kbd></a></li>
-                            <li><a href="/openport"><kbd>Open Port</kbd></a></li>
-                            <li><a href="/actor"><kbd>Actor</kbd></a></li>
-                            <li><a href="/event/page/{{.EventIndex}}"><kbd>Event</kbd></a></li>
-                            <li><a href="/preview"><kbd>Preview</kbd></a></li>
+						<li>
+							<details class="dropdown">
+								<summary role="button" class="contrast">
+									Form
+								</summary>
+								<ul dir="ltl">
+									<li><a href="/credleak">Cred Leak</a></li>
+									<li><a href="/openport">Open Port</a></li>
+									<li><a href="/actor">Actor</a></li>
+									<li><a href="/event/page/{{.EventIndex}}">Event</a></li>
+									<li><a href="/csv">CSV</a></li>
+								</ul>
+							</details>
+						</li>
+                        <li><a  role="button" class="contrast" href="/preview">Markdown Preview</a></li>
                     </ul>
             </nav>
         </div>

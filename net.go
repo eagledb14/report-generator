@@ -26,6 +26,7 @@ func serv(port string, state *types.State) {
 	servEvents(app, state)
 	servEvents(app, state)
 	servMarkdown(app, state)
+	servCsv(app, state)
 
 	app.Static("/style.css", "./resources/style.css")
 
@@ -287,4 +288,26 @@ func servMarkdown(app *fiber.App, state *types.State) {
 		return c.SendString(form)
 	})
 
+}
+
+func servCsv(app *fiber.App, state *types.State) {
+	app.Get("/csv", func(c *fiber.Ctx) error {
+		c.Set("Content-Type", "text/html")
+
+		return c.SendString(t.BuildPage(t.Csv(), state))
+	})
+
+	app.Post("/csv", func(c *fiber.Ctx) error {
+		name := c.FormValue("orgName")
+		query := c.FormValue("ipAddress")
+
+		state.Name = strings.Clone(name)
+		state.Markdown = createform.CreateCsv(query)
+		return c.SendStatus(fiber.StatusOK)
+	})
+
+	app.Get("/csv/create", func(c *fiber.Ctx) error {
+		c.Set("Content-Disposition", "attachment; filename=\""+state.Name + ".csv\"")
+		return c.SendString(state.Markdown)
+	})
 }

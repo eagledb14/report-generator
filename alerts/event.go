@@ -255,33 +255,54 @@ func DownloadRss() []*Event {
 
 type Net struct {
 	Matches []struct {
+		Asn string `json:"asn,omitempty"`
+		Timestamp string `json:"timestamp,omitempty"`
+		Domains []string `json:"domains,omitempty"`
+		Hostnames []string `json:"hostnames,omitempty"`
+		Product string `json:"product,omitempty"`
+		Location struct {
+			City string `json:"city,omitempty"`
+			CountryName string`json:"country_name,omitempty"`
+			CountryCode string `json:"country_code,omitempty"`
+			RegionCode string `json:"region_code,omitempty"`
+		} `json:"location,omitempty"`
+		Org string `json:"org,omitempty"`
+		Isp string `json:"isp,omitempty"`
+		Os string `json:"os,omitempty"`
+		Transport string `json:"transport,omitempty"`
+		Port string `json:"port,omitempty"`
 		Ip string `json:"ip_str,omitempty"`
 	} `json:"matches,omitempty"`
 }
 
-func DownloadIpList(name string, queries string) []*Event {
+func DownloadMatches(queries string) Net {
 	apiKey := os.Getenv("API_KEY")
+	queries = strings.ReplaceAll(queries, " ", "")
+
 	url :="https://api.shodan.io/shodan/host/search?key=" + apiKey + "&query=net:" + queries 
 	response, err := http.Get(url)
 	if err != nil {
-		return []*Event{}
+		return Net{}
 	}
 
 	if response.StatusCode != http.StatusOK {
 		fmt.Printf("Error: received status code %d\n", response.StatusCode)
-		return []*Event{}
+		return Net{}
 	}
 	defer response.Body.Close()
 
 	body, _ := io.ReadAll(response.Body)
-	nets := Net{}
-	json.Unmarshal(body, &nets)
+	net := Net{}
+	json.Unmarshal(body, &net)
+	return net
+}
 
-
+func DownloadIpList(name string, queries string) []*Event {
+	net := DownloadMatches(queries)
 	var wg sync.WaitGroup
 	events := []*Event{}
 
-	outer: for _, ip := range nets.Matches {
+	outer: for _, ip := range net.Matches {
 		newEvent := NewIpEvent(ip.Ip)
 
 		// make sure there are only unique events in the list
