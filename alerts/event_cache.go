@@ -38,6 +38,26 @@ timestamp TEXT
 )`)
 }
 
+func (e* EventCache) ClearTable() {
+    tx, err := e.db.Begin()
+    if err != nil {
+        return 
+    }
+    
+    _, err = tx.Exec(`DROP TABLE IF EXISTS events`)
+    if err != nil {
+        tx.Rollback()
+        return
+    }
+    
+    err = tx.Commit()
+    if err != nil {
+        return
+    }
+    
+    e.ensureTable()
+}
+
 func (e *EventCache) HasEventBeenSeen(event *Event) bool {
 	tx, err := e.db.Begin()
 	defer tx.Commit()

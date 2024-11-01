@@ -1,13 +1,15 @@
 package main
 
 import (
-	createform "github.com/eagledb14/form-scanner/create-form"
-	"github.com/eagledb14/form-scanner/alerts"
-	"github.com/eagledb14/form-scanner/types"
-	"github.com/gofiber/fiber/v2"
 	"strconv"
 	"strings"
+	"time"
+
+	"github.com/eagledb14/form-scanner/alerts"
+	createform "github.com/eagledb14/form-scanner/create-form"
 	t "github.com/eagledb14/form-scanner/templates"
+	"github.com/eagledb14/form-scanner/types"
+	"github.com/gofiber/fiber/v2"
 )
 
 func serv(port string, state *types.State) {
@@ -248,6 +250,19 @@ func servEvents(app *fiber.App, state *types.State) {
 		state.Tlp = form.Tlp
 
 		return c.Redirect("/preview")
+	})
+
+	app.Put("/event/reset", func(c *fiber.Ctx) error {
+		cache := alerts.NewEventCache()
+		cache.ClearTable()
+
+		events := alerts.DownloadRss()
+		state.FeedEvents = events
+		state.LoadEvents()
+		state.EventIndex = 0
+		time.Sleep(time.Duration(2 * time.Second))
+
+		return c.SendString(t.BuildPage(t.EventList(state.FeedEvents, state.EventIndex), state))
 	})
 }
 

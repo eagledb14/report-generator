@@ -20,16 +20,21 @@ type State struct {
 func NewState() State {
     feedEvents := alerts.DownloadRss()
 
-    for _, e := range feedEvents {
-	time.Sleep(time.Duration(1))
+    newState :=  State{
+	FeedEvents: feedEvents,
+	Tlp: true,
+    }
+
+    newState.LoadEvents()
+    return newState
+}
+
+func (e *State) LoadEvents() {
+    for _, e := range e.FeedEvents {
+	time.Sleep(time.Duration(1 * time.Second))
 	go func(e *alerts.Event) {
 	    e.Load()
 	}(e)
-    }
-
-    return State{
-	FeedEvents: feedEvents,
-	Tlp: true,
     }
 }
 

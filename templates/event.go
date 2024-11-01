@@ -9,20 +9,22 @@ import (
 
 func EventList(events []*alerts.Event, index int) string {
 
-    data := struct {
-		Events []*alerts.Event
+	data := struct {
+		Events     []*alerts.Event
 		EventIndex int
-		NextIndex int
-		PrevIndex int
-    } {
-		Events: paginate(events, index),
+		NextIndex  int
+		PrevIndex  int
+	}{
+		Events:     paginate(events, index),
 		EventIndex: index,
-		NextIndex: index + 1,
-		PrevIndex: index - 1,
-    }
+		NextIndex:  index + 1,
+		PrevIndex:  index - 1,
+	}
 
-    const page = `
-	<h1>Event: {{.EventIndex}}</h1>
+	const page = `
+	<h1>Event: {{.EventIndex}} </h1>
+	<button class="outline secondary" id="reset" hx-put="/event/reset" hx-target="body" hx-indicator="#load">Clear Event Cache</button>
+	<div id="load" class="htmx-indicator center" aria-busy="true">Loading...</div>
 	{{if eq (len .Events) 0}}
 	<h2>No New Events</h2>
 	{{end}}
@@ -45,27 +47,27 @@ func EventList(events []*alerts.Event, index int) string {
 	</div>
         `
 
-    return ExecuteText("event", page, data)
+	return ExecuteText("event", page, data)
 }
 
 func EventView(event *alerts.Event, index int, form types.Form, eventPage int) string {
 	data := struct {
-		Name string
-		Event *alerts.Event
+		Name       string
+		Event      *alerts.Event
 		EventIndex int
-		EventPage int
-		Form string
-		FormName string
+		EventPage  int
+		Form       string
+		FormName   string
 	}{
-		Name: event.Name,
-		Event: event,
-		EventPage: eventPage,
+		Name:       event.Name,
+		Event:      event,
+		EventPage:  eventPage,
 		EventIndex: index,
-		Form: getForm(form, event.Name, []*alerts.Event{event}, "/event/" + strconv.Itoa(index)),
-		FormName: types.FormName[form], 
+		Form:       getForm(form, event.Name, []*alerts.Event{event}, "/event/"+strconv.Itoa(index)),
+		FormName:   types.FormName[form],
 	}
 
-    const page = `
+	const page = `
         <h1>Event</h1>
 	<button hx-get="/event/page/{{.EventPage}}" hx-push-url="true" hx-target="body"><</button>
 	<h1>{{.Name}}</h1>
@@ -98,7 +100,7 @@ func EventView(event *alerts.Event, index int, form types.Form, eventPage int) s
 	{{.Form}}
         `
 
-    return ExecuteText("eventPager", page, data)
+	return ExecuteText("eventPager", page, data)
 }
 
 func paginate(events []*alerts.Event, index int) []*alerts.Event {
