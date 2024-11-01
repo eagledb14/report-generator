@@ -110,22 +110,3 @@ func Actors() string {
 
     return Execute("actor", page, data)
 }
-
-
-  // ${buildFormText("Primary Name", "name")}
-  //       ${buildFormText("Alias", "alias")}
-  //       ${buildFormText("First seen activity [ DD MM, YYYY]", "date")}
-  //       ${buildFormText("Country of Origin", "country")}
-  //       ${buildFormText("Motivation", "motivation")}
-  //       ${buildFormText("Targeting", "target")}
-  //       ${buildFormText("Malware Name", "malware")}
-  //       ${buildFormText("Third Party Reporting", "reporter")}
-  //
-  //       ${buildFormRadio(listOf("High", "Medium", "Low"), "confidence", checked=0, title="Assessment Confidence")}
-  //
-  //       ${buildFormArea("Exploits", "exploits")}
-  //       ${buildFormArea("Attack Chain Summary", "summary")}
-  //       ${buildFormArea("Capabilities", "capabilities")}
-  //       ${buildFormArea("Detection names", "detection")}
-  //       ${buildFormArea("TTPS", "ttps")}
-  //       ${buildFormArea("Infrastructure", "infra")}

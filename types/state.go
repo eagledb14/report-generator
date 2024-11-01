@@ -10,10 +10,11 @@ type State struct {
     FeedEvents []*alerts.Event
     Events []*alerts.Event
     Name string
-    FormType Form
     EventIndex int
     Markdown string
     AlertId string
+    Title string
+    Tlp bool
 }
 
 func NewState() State {
@@ -28,6 +29,7 @@ func NewState() State {
 
     return State{
 	FeedEvents: feedEvents,
+	Tlp: true,
     }
 }
 

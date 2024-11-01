@@ -79,7 +79,6 @@ h3 {
 }
 </style>`
 }
-	// border: 1px solid black;
 
 func getAlertId(formNumber string) string {
 	return time.Now().Format("20060102") + formNumber
