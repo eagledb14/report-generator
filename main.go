@@ -25,10 +25,11 @@ func main() {
 		autoCreateEventFiles()
 	} else {
 		state := types.NewState()
-		port, err := getRandomPort()
-		if err != nil {
-			panic(err)
-		}
+		// port, err := getRandomPort()
+		// if err != nil {
+		// 	panic(err)
+		// }
+		port := ":8080"
 
 		go openBrowser("localhost" + port)
 		serv(port, &state)

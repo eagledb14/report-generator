@@ -61,6 +61,7 @@ func Banner(state *types.State) string {
 									<li><a href="/csv">CSV</a></li>
 									<li><a href="/event/page/{{.EventIndex}}">Event</a></li>
 									<li><a href="/openport">Open Port</a></li>
+									<li><a href="/portview">Port Viewer</a></li>
 								</ul>
 							</details>
 						</li>

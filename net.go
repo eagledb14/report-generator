@@ -27,6 +27,7 @@ func serv(port string, state *types.State) {
 	servEvents(app, state)
 	servMarkdown(app, state)
 	servCsv(app, state)
+	servPortViewer(app, state)
 
 	app.Static("/style.css", "./resources/style.css")
 
@@ -309,5 +310,25 @@ func servCsv(app *fiber.App, state *types.State) {
 	app.Get("/csv/create", func(c *fiber.Ctx) error {
 		c.Set("Content-Disposition", "attachment; filename=\""+state.Name + ".csv\"")
 		return c.SendString(state.Markdown)
+	})
+}
+
+func servPortViewer(app *fiber.App, state *types.State) {
+	app.Get("/portview", func(c *fiber.Ctx) error {
+		c.Set("Content-Type", "text/html")
+		return c.SendString(t.BuildPage(t.PortViewer(), state))
+	})
+
+	app.Post("/portview", func(c *fiber.Ctx) error {
+		ips := c.FormValue("ipAddress")
+		form := createform.PortViewer{
+			Events: alerts.DownloadIpList("", ips),
+		}
+
+		state.Markdown = form.CreateMarkdown()
+		state.Name = ""
+		state.Tlp = false
+
+		return c.Redirect("/preview")
 	})
 }
