@@ -3,7 +3,7 @@
 build
 
 ./resources/*.env
-./resources/event_cache*
+./resources/event_cache.db
 *.env
 *.docx
 shodan-form*
