@@ -53,14 +53,14 @@ func Banner(state *types.State) string {
 						<li>
 							<details class="dropdown">
 								<summary role="button" class="contrast">
-									Form
+									Reports
 								</summary>
 								<ul dir="ltl">
-									<li><a href="/credleak">Cred Leak</a></li>
-									<li><a href="/openport">Open Port</a></li>
 									<li><a href="/actor">Actor</a></li>
-									<li><a href="/event/page/{{.EventIndex}}">Event</a></li>
+									<li><a href="/credleak">Cred Leak</a></li>
 									<li><a href="/csv">CSV</a></li>
+									<li><a href="/event/page/{{.EventIndex}}">Event</a></li>
+									<li><a href="/openport">Open Port</a></li>
 								</ul>
 							</details>
 						</li>

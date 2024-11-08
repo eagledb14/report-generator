@@ -15,6 +15,7 @@ import (
 )
 
 func main() {
+	checkResources()
 	loadEnvVars()
 
 	auto := flag.Bool("auto", false, "run in automatic mode")
@@ -94,4 +95,13 @@ func getRandomPort() (string, error) {
 	defer listener.Close()
 	addr := listener.Addr().(*net.TCPAddr)
 	return ":" + strconv.Itoa(addr.Port), nil
+}
+
+func checkResources() {
+	path := "./resources"
+
+	info, err := os.Stat(path)
+	if os.IsNotExist(err) || !info.IsDir() {
+		panic("Missing resources folder")
+	}
 }

@@ -18,15 +18,16 @@ type State struct {
 }
 
 func NewState() State {
-    feedEvents := alerts.DownloadRss()
-
-    newState :=  State{
-	FeedEvents: feedEvents,
-	Tlp: true,
-    }
-
-    newState.LoadEvents()
-    return newState
+ //    feedEvents := alerts.DownloadRss()
+	//
+ //    newState :=  State{
+	// FeedEvents: feedEvents,
+	// Tlp: true,
+ //    }
+	//
+ //    newState.LoadEvents()
+ //    return newState
+    return State{}
 }
 
 func (e *State) LoadEvents() {
