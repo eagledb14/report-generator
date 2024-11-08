@@ -18,6 +18,7 @@ func main() {
 	checkResources()
 	loadEnvVars()
 
+
 	auto := flag.Bool("auto", false, "run in automatic mode")
 	flag.Parse()
 
@@ -25,11 +26,13 @@ func main() {
 		autoCreateEventFiles()
 	} else {
 		state := types.NewState()
-		// port, err := getRandomPort()
-		// if err != nil {
-		// 	panic(err)
-		// }
-		port := ":8080"
+		var port = ""
+
+		if os.Getenv("DEV") == "true" {
+			port = ":8080"
+		} else {
+			port, _ = getRandomPort()
+		}
 
 		go openBrowser("localhost" + port)
 		serv(port, &state)

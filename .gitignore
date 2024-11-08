@@ -2,8 +2,8 @@
 # Ignore Gradle build output directory
 build
 
-./resources/*.env
-./resources/event_cache.db
+resources/*.env
+resources/*.db
 *.env
 *.docx
 shodan-form*
