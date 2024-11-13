@@ -41,7 +41,7 @@ func autoCreateEventFiles() {
 	state := &types.State{}
 	for i, form := range forms {
 		md := form.CreateMarkdown(state)
-		html := createform.CreateHtml(md, events[i].Name, true)
+		html := createform.CreateHeaderHtml(md, events[i].Name, true)
 
 		fileName := "./generated-forms/" + events[i].Name + "-" + state.AlertId + ".html"
 		fmt.Println(fileName)

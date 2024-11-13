@@ -32,6 +32,15 @@ func banner(title string, amber bool) string {
 `
 }
 
+func cover(title string) string {
+	return `
+<div class="centered">
+	<h1>` + title + `</h1>
+	<h1>Appendix G - Open-Source Exposure Report</h1>
+</div>
+`
+}
+
 func footer(amber bool) string {
 	if amber {
 		return "Recipients may share TLP:AMBER information with members of their own organization and its clients on a need-to-know basis to protect their organization and its clients and prevent further harm."
@@ -60,9 +69,6 @@ img {
 }
 .green {
 	color: #33FF00;
-}
-.small {
-
 }
 .centered {
 	display: flex;

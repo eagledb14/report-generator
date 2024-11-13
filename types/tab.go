@@ -1,12 +1,10 @@
 package types
 
-type Page int
+type ReportType int
 
 const (
-    Actor Page = iota
-    CredLeak
-    Events
-    OpenPort
+    Header ReportType = iota
+    FullPage
 )
 
 type Form int

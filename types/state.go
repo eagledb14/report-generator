@@ -15,19 +15,20 @@ type State struct {
     AlertId string
     Title string
     Tlp bool
+    Report ReportType
 }
 
 func NewState() State {
- //    feedEvents := alerts.DownloadRss()
-	//
- //    newState :=  State{
-	// FeedEvents: feedEvents,
-	// Tlp: true,
- //    }
-	//
- //    newState.LoadEvents()
- //    return newState
-    return State{}
+    feedEvents := alerts.DownloadRss()
+
+    newState :=  State{
+	FeedEvents: feedEvents,
+	Tlp: true,
+	Report: Header,
+    }
+
+    newState.LoadEvents()
+    return newState
 }
 
 func (e *State) LoadEvents() {

@@ -12,11 +12,11 @@ type PortViewer struct {
 func (p *PortViewer) CreateMarkdown() string {
 	const page = `
 {{range .Events}}
-### [{{.Ip}}]({{.HostLink}})
-{{range $key, $value := .Ports}}
+### {{.Ip}}
+{{range $key, $cve := .Ports}}
 {{$key}}
-{{range $value}}
-- [{{.Name}}](https://www.cve.org/CVERecord?id={{.Name}}) Priority: {{.Rank}}
+{{range $cve}}
+- {{.Name}}) Priority: {{.Rank}}
 {{end}}
 {{end}}
 {{end}}

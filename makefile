@@ -1,8 +1,8 @@
 all: run
 
 build:
-	GOOS=linux GOARCH=amd64 go build -o form-scanner .
-	GOOS=windows GOARCH=amd64 go build -o form-scanner.exe .
+	GOOS=linux GOARCH=amd64 go build -ldflags "-s -w"  -o form-scanner .
+	GOOS=windows GOARCH=amd64 go build -ldflags "-s -w"  -o form-scanner.exe .
 	-rm ./resources/event_cache.db
 	zip -r form-scanner.zip ./resources ./form-scanner*
 	rm form-scanner

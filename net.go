@@ -57,6 +57,7 @@ func servCredLeak(app *fiber.App, state *types.State) {
 		state.Name = strings.Clone(form.OrgName)
 		state.Title = "Threat Intel Summary"
 		state.Tlp = form.Tlp
+		state.Report = types.Header
 
 		return c.Redirect("/preview")
 	})
@@ -89,6 +90,7 @@ func servOpenPort(app *fiber.App, state *types.State) {
 		state.Markdown = form.CreateMarkdown(state)
 		state.Title = "Threat Intel Summary"
 		state.Tlp = form.Tlp
+		state.Report = types.Header
 
 		return c.Redirect("/preview")
 	})
@@ -156,6 +158,7 @@ func servActor(app *fiber.App, state *types.State) {
 		state.Name = strings.Clone(form.Name)
 		state.Title = "Threat Actor Profile"
 		state.Tlp = false
+		state.Report = types.Header
 
 		return c.Redirect("/preview")
 	})
@@ -250,6 +253,7 @@ func servEvents(app *fiber.App, state *types.State) {
 		state.Name = strings.Clone(form.OrgName)
 		state.Title = "Threat Intel Summary"
 		state.Tlp = form.Tlp
+		state.Report = types.Header
 
 		return c.Redirect("/preview")
 	})
@@ -285,7 +289,7 @@ func servMarkdown(app *fiber.App, state *types.State) {
 	app.Get("/create", func(c *fiber.Ctx) error {
 		c.Set("Content-Disposition", "attachment; filename=\""+state.Name+"-"+state.AlertId+".html\"")
 
-		form := createform.CreateHtml(state.Markdown, state.Title, state.Tlp)
+		form := createform.CreateHeaderHtml(state.Markdown, state.Title, state.Tlp)
 		return c.SendString(form)
 	})
 
@@ -330,5 +334,12 @@ func servPortViewer(app *fiber.App, state *types.State) {
 		state.Tlp = false
 
 		return c.Redirect("/preview")
+	})
+}
+
+func servOsint(app *fiber.App, state *types.State) {
+	app.Get("/osint", func(c *fiber.Ctx) error {
+		c.Set("Content-Type", "text/html")
+		return c.SendString(t.BuildPage(t.PortViewer(), state))
 	})
 }
