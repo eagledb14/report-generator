@@ -28,6 +28,7 @@ func serv(port string, state *types.State) {
 	servMarkdown(app, state)
 	servCsv(app, state)
 	servPortViewer(app, state)
+	servOsint(app, state)
 
 	app.Static("/style.css", "./resources/style.css")
 
@@ -107,7 +108,6 @@ func servOpenPort(app *fiber.App, state *types.State) {
 		ips := c.FormValue("ipAddress")
 
 		events := alerts.DownloadIpList(name, ips)
-		events = alerts.FilterEvents(events)
 
 		state.Events = events
 		state.Name = strings.Clone(name)
@@ -289,7 +289,15 @@ func servMarkdown(app *fiber.App, state *types.State) {
 	app.Get("/create", func(c *fiber.Ctx) error {
 		c.Set("Content-Disposition", "attachment; filename=\""+state.Name+"-"+state.AlertId+".html\"")
 
-		form := createform.CreateHeaderHtml(state.Markdown, state.Title, state.Tlp)
+		form := ""
+
+		switch state.Report {
+		case types.Header:
+			form = createform.CreateHeaderHtml(state.Markdown, state.Title, state.Tlp)
+		case types.Cover:
+			form = createform.CreateCoverHtml(state.Markdown, state.Title)
+		}
+
 		return c.SendString(form)
 	})
 
@@ -340,6 +348,46 @@ func servPortViewer(app *fiber.App, state *types.State) {
 func servOsint(app *fiber.App, state *types.State) {
 	app.Get("/osint", func(c *fiber.Ctx) error {
 		c.Set("Content-Type", "text/html")
-		return c.SendString(t.BuildPage(t.PortViewer(), state))
+		return c.SendString(t.BuildPage(t.Osint(), state))
+	})
+
+	app.Post("/osint", func(c *fiber.Ctx) error {
+		name := strings.Clone(c.FormValue("orgName"))
+		inScope := c.FormValue("inScope")
+		outScope := c.FormValue("outScope")
+
+		inScopEvents := alerts.DownloadIpList(name, inScope)
+		outScopeEvents := alerts.DownloadIpList(name, outScope)
+
+		events := append(outScopeEvents, inScopEvents...)
+		events = alerts.FilterEvents(events)
+
+		recordedFutureCreds := alerts.ParseCredentialDump(c.FormValue("recordedFutureCreds"))
+		otherCreds := alerts.ParseOtherCreds(c.FormValue("otherCreds"))
+
+		vulnerableUrls, _ := strconv.Atoi(c.FormValue("vulnerableUrls"))
+
+		creds := append(recordedFutureCreds, otherCreds...)
+		creds = alerts.SortCreds(creds)
+
+		form := createform.Osint{
+			Name: name, 
+			InScope: strings.Split(inScope, ","),
+			OutScope: strings.Split(outScope, ","),
+			Events: events,
+			Creds: creds,
+			Url: c.FormValue("url"),
+			VulnerableUrls: vulnerableUrls,
+			AssetSeverity: c.FormValue("assetSeverity"),
+			AccountSeverity: c.FormValue("accountSeverity"),
+			WebsiteSeverity: c.FormValue("websiteSeverity"),
+		}
+		state.Name = form.Name
+		state.Title = ""
+		state.Report = types.Cover
+		state.Markdown = form.CreateMarkdown()
+
+
+		return c.Redirect("/preview")
 	})
 }

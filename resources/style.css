@@ -22,3 +22,8 @@ textarea {
 	padding-left: 10px;
 	padding-right: 10px;
 }
+
+.unset {
+    color: inherit;
+    text-decoration: none;
+}

@@ -4,7 +4,7 @@ type ReportType int
 
 const (
     Header ReportType = iota
-    FullPage
+    Cover
 )
 
 type Form int

@@ -15,13 +15,27 @@ import (
 )
 
 func main() {
-	// run()
+	loadEnvVars()
+	// fmt.Println(alerts.ParseOtherCreds("1,178347108237rjdfp;laskjdf;lkuj,2,3,4,5"))
+	run()
+	// o := createform.Osint{
+	// 	Name: "Jordan University",
+	// 	InScope: []string{"216.237.226.5", "216.237.215.180", "199.184.89.200", "199.184.89.242", "216.237.226.1", "199.184.89.23", "216.237.226.7", "216.237.217.243", "199.184.89.199"},
+	// 	OutScope: []string{"199.184.89.239", "216.237.217.244", "216.237.224.6"},
+	// 	Events: alerts.DownloadIpList("Jordan University", "199.184.89.242, 199.184.89.242, 199.184.89.235,  216.237.226.26"),
+	// }
+	// file, _ := os.ReadFile("cred-test")
+	// creds := alerts.ParseCredentialDump(string(file), "nhcgov.com")
+	// o.Creds = creds
+	//
+	// html := createform.CreateCoverHtml(o.CreateMarkdown(), o.Name)
+	// _ = html
+	// fmt.Println(html)
+
 }
 
 func run() {
 	checkResources()
-	loadEnvVars()
-
 
 	auto := flag.Bool("auto", false, "run in automatic mode")
 	flag.Parse()
@@ -32,7 +46,7 @@ func run() {
 		state := types.NewState()
 		var port = ""
 
-		if os.Getenv("DEV") == "true" {
+if os.Getenv("DEV") == "true" {
 			port = ":8080"
 		} else {
 			port, _ = getRandomPort()

@@ -29,6 +29,7 @@ func NewState() State {
 
     newState.LoadEvents()
     return newState
+    // return State{}
 }
 
 func (e *State) LoadEvents() {
@@ -47,5 +48,10 @@ func (e *State) GetFeedEvent(index int) *alerts.Event {
 	index = len(e.FeedEvents) - 1
     }
 
-    return e.FeedEvents[index + (e.EventIndex * 10)]
+    pagedIndex := index + (e.EventIndex * 10)
+    if pagedIndex >= len(e.FeedEvents) {
+	pagedIndex = len(e.FeedEvents) - 1
+    }
+
+    return e.FeedEvents[pagedIndex]
 }

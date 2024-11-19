@@ -53,17 +53,17 @@ func NewEventFromItem(item Item) Event {
 	}
 }
 
-func NewIpEvent(ip string) Event {
-	return Event {
-		Ip: ip, 
-		HostLink:    "https://www.shodan.io/host/" + ip,
-		Ports: make(map[int][]Cve),
+func NewEventFromIp(ip string) Event {
+	return Event{
+		Ip:       ip,
+		HostLink: "https://www.shodan.io/host/" + ip,
+		Ports:    make(map[int][]Cve),
 	}
 }
 
-func (e *Event) Load() Event {
+func (e *Event) Load() {
 	if e.Loaded == true {
-		return *e
+		return
 	}
 
 	go func(e *Event) {
@@ -82,7 +82,6 @@ func (e *Event) Load() Event {
 	e.parseCves(banner)
 
 	e.Loaded = true
-	return *e
 }
 
 func (e *Event) getAlertId(retries int) {
@@ -178,10 +177,8 @@ func (e *Event) parseCves(banner Banner) {
 	}
 	for _, d := range banner.Data {
 		for name, vuln := range d.Vulns {
-			cve := NewCve(name, vuln)
-			if cve.Rank != 4 {
-				e.Ports[d.Port] = append(e.Ports[d.Port], cve)
-			}
+			cve := NewCve(name, vuln, d.Cpe)
+			e.Ports[d.Port] = append(e.Ports[d.Port], cve)
 		}
 		sort.Slice(e.Ports[d.Port], func(i, j int) bool {
 			return e.Ports[d.Port][i].Rank < e.Ports[d.Port][j].Rank
@@ -189,18 +186,29 @@ func (e *Event) parseCves(banner Banner) {
 	}
 }
 
+// removes the ips with no cves
+func (e *Event) FilterCves() {
+	for key, value := range e.Ports {
+		if len(value) == 0 {
+			delete(e.Ports, key)
+		}
+	}
+}
+
 type Vuln struct {
-	Cvss   float32 `json:"cvss,omitempty"`
-	CvssV2 float32 `json:"cvss_v2,omitempty"`
-	Epss   float32 `json:"epss,omitempty"`
-	Kev    bool    `json:"kev,omitempty"`
+	Cvss    float32 `json:"cvss,omitempty"`
+	CvssV2  float32 `json:"cvss_v2,omitempty"`
+	Epss    float32 `json:"epss,omitempty"`
+	Kev     bool    `json:"kev,omitempty"`
+	Summary string  `json:"summary,omitempty"`
 }
 
 type Banner struct {
 	Data []struct {
-		Port    int             `json:"port"`
+		Port    int             `json:"port,omitempty"`
 		Vulns   map[string]Vuln `json:"vulns,omitempty"`
 		Product string          `json:"product,omitempty"`
+		Cpe     []string        `json:"cpe23,omitempty"`
 	} `json:"data"`
 	Ports []int `json:"ports"`
 }
@@ -255,23 +263,23 @@ func DownloadRss() []*Event {
 
 type Net struct {
 	Matches []struct {
-		Asn string `json:"asn,omitempty"`
-		Timestamp string `json:"timestamp,omitempty"`
-		Domains []string `json:"domains,omitempty"`
+		Asn       string   `json:"asn,omitempty"`
+		Timestamp string   `json:"timestamp,omitempty"`
+		Domains   []string `json:"domains,omitempty"`
 		Hostnames []string `json:"hostnames,omitempty"`
-		Product string `json:"product,omitempty"`
-		Location struct {
-			City string `json:"city,omitempty"`
-			CountryName string`json:"country_name,omitempty"`
+		Product   string   `json:"product,omitempty"`
+		Location  struct {
+			City        string `json:"city,omitempty"`
+			CountryName string `json:"country_name,omitempty"`
 			CountryCode string `json:"country_code,omitempty"`
-			RegionCode string `json:"region_code,omitempty"`
+			RegionCode  string `json:"region_code,omitempty"`
 		} `json:"location,omitempty"`
-		Org string `json:"org,omitempty"`
-		Isp string `json:"isp,omitempty"`
-		Os string `json:"os,omitempty"`
+		Org       string `json:"org,omitempty"`
+		Isp       string `json:"isp,omitempty"`
+		Os        string `json:"os,omitempty"`
 		Transport string `json:"transport,omitempty"`
-		Port string `json:"port,omitempty"`
-		Ip string `json:"ip_str,omitempty"`
+		Port      string `json:"port,omitempty"`
+		Ip        string `json:"ip_str,omitempty"`
 	} `json:"matches,omitempty"`
 }
 
@@ -279,7 +287,7 @@ func DownloadMatches(queries string) Net {
 	apiKey := os.Getenv("API_KEY")
 	queries = strings.ReplaceAll(queries, " ", "")
 
-	url :="https://api.shodan.io/shodan/host/search?key=" + apiKey + "&query=net:" + queries 
+	url := "https://api.shodan.io/shodan/host/search?key=" + apiKey + "&query=net:" + queries
 	response, err := http.Get(url)
 	if err != nil {
 		return Net{}
@@ -302,8 +310,9 @@ func DownloadIpList(name string, queries string) []*Event {
 	var wg sync.WaitGroup
 	events := []*Event{}
 
-	outer: for _, ip := range net.Matches {
-		newEvent := NewIpEvent(ip.Ip)
+outer:
+	for _, ip := range net.Matches {
+		newEvent := NewEventFromIp(ip.Ip)
 
 		// make sure there are only unique events in the list
 		for _, e := range events {
@@ -339,3 +348,24 @@ func FilterEvents(events []*Event) []*Event {
 
 	return newEventList
 }
+
+func FilterCveEvents(events []*Event) []*Event {
+	events = FilterEvents(events)
+	newEventList := []*Event{}
+
+	for _, e := range events {
+		hasCve := false
+		for _, value := range e.Ports {
+			if len(value) > 0 {
+				hasCve = true
+				break
+			}
+		}
+		if hasCve {
+			newEventList = append(newEventList, e)
+		}
+	}
+
+	return newEventList
+}
+

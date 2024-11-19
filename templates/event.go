@@ -35,13 +35,13 @@ func EventList(events []*alerts.Event, index int) string {
 			<br>
 			{{$event.Desc}}
 			<br>
-			<button class="outline" hx-get="/event/{{$index}}" hx-push-url="true" hx-target="body" onclick="window.scrollTo(0, 0);">Details</button>
+			<a href="/event/{{$index}}" class="unset"><button class="outline">Details</button></a>
 		</article>
 	{{end}}
 
 	<div class="grid">
-		<button id="prev" hx-get="/event/page/{{.PrevIndex}}" hx-push-url="true" hx-target="body" onclick="window.scrollTo(0, 0);"><</button>
-		<button id="next" hx-get="/event/page/{{.NextIndex}}" hx-push-url="true" hx-target="body" onclick="window.scrollTo(0, 0);">></button>
+		<button id="prev" hx-get="/event/page/{{.PrevIndex}}" hx-target="body"><</button>
+		<button id="next" hx-get="/event/page/{{.NextIndex}}" hx-target="body">></button>
 		<div></div>
 		<div></div>
 	</div>
@@ -68,8 +68,8 @@ func EventView(event *alerts.Event, index int, form types.Form, eventPage int) s
 	}
 
 	const page = `
-        <h1>Event</h1>
-	<button hx-get="/event/page/{{.EventPage}}" hx-push-url="true" hx-target="body"><</button>
+    <h1>Event</h1>
+	<a href="/event/page/{{.EventPage}}" class="unset"><button><</button></a>
 	<h1>{{.Name}}</h1>
 	<h6>{{.Event.Desc}}</h6>
 	<article>

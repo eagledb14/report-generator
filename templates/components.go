@@ -22,6 +22,20 @@ func Execute(name string, t string, data interface{}) string {
 	return b.String()
 }
 
+func ExecuteFunctions(name string, t string, data interface{}, fn template.FuncMap) string {
+	tmpl, err := text.New(name).Funcs(fn).Parse(t)
+	if err != nil {
+		return err.Error()
+	}
+	var b bytes.Buffer
+	err = tmpl.Execute(&b, data)
+	if err != nil {
+		return err.Error()
+	}
+
+	return b.String()
+}
+
 // The reason both functions are needed is because html/template sanitizes
 // the html input, which is something we want, unless we already
 // sanitized the input
@@ -61,6 +75,7 @@ func Banner(state *types.State) string {
 									<li><a href="/csv">CSV</a></li>
 									<li><a href="/event/page/{{.EventIndex}}">Event</a></li>
 									<li><a href="/openport">Open Port</a></li>
+									<li><a href="/osint">Osint</a></li>
 									<li><a href="/portview">Port Viewer</a></li>
 								</ul>
 							</details>

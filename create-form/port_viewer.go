@@ -16,7 +16,7 @@ func (p *PortViewer) CreateMarkdown() string {
 {{range $key, $cve := .Ports}}
 {{$key}}
 {{range $cve}}
-- {{.Name}}) Priority: {{.Rank}}
+- {{.Name}} Priority: {{.Rank}}
 {{end}}
 {{end}}
 {{end}}

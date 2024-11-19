@@ -110,18 +110,6 @@ func getSourcesString(events []*alerts.Event) string {
 	return builder.String()
 }
 
-func hasCves(events []*alerts.Event) bool {
-	for _, event := range events {
-		for _, cves := range event.Ports {
-			if len(cves) > 0 {
-				return true
-			}
-		}
-	}
-
-	return false
-}
-
 func cvePriorityKey() string {
 	return `
 ## CVE Priority Key
