@@ -1,4 +1,4 @@
-# Form-Generator
+# Report-Generator
 
 Form Generator for creating reports quickly for Cyber Security Alerting purposes.
 
@@ -21,4 +21,4 @@ If the browser window does not open, the terminal shows the port on localhost th
 
 ```make build``` creates a zip file that has all the required files to run on windows and linux.
 
-Windows Defender does not like the .exe so an exception needs to be made for it to run.
+Windows Defender does not like report-generator.exe so an exception needs to be made for it to run.
