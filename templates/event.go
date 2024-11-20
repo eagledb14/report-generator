@@ -40,8 +40,8 @@ func EventList(events []*alerts.Event, index int) string {
 	{{end}}
 
 	<div class="grid">
-		<button id="prev" hx-get="/event/page/{{.PrevIndex}}" hx-target="body"><</button>
-		<button id="next" hx-get="/event/page/{{.NextIndex}}" hx-target="body">></button>
+		<a href="/event/page/{{.PrevIndex}}" class="unset"><button><</button></a>
+		<a href="/event/page/{{.NextIndex}}" class="unset"><button>></button></a>
 		<div></div>
 		<div></div>
 	</div>
