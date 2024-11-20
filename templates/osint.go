@@ -51,8 +51,8 @@ func Osint() string {
 		    LOW
 		</label>
 		<label>
-		    <input type="radio" value="MEDIUM" name="assetSeverity">
-		    MEDIUM
+		    <input type="radio" value="MODERATE" name="assetSeverity">
+		    MODERATE
 		</label>
 		<label>
 		    <input type="radio" value="HIGH" name="assetSeverity">
@@ -72,8 +72,8 @@ func Osint() string {
 		    LOW
 		</label>
 		<label>
-		    <input type="radio" value="MEDIUM" name="accountSeverity">
-		    MEDIUM
+		    <input type="radio" value="MODERATE" name="accountSeverity">
+		    MODERATE
 		</label>
 		<label>
 		    <input type="radio" value="HIGH" name="accountSeverity">
@@ -93,8 +93,8 @@ func Osint() string {
 		    LOW
 		</label>
 		<label>
-		    <input type="radio" value="MEDIUM" name="websiteSeverity">
-		    MEDIUM
+		    <input type="radio" value="MODERATE" name="websiteSeverity">
+		    MODERATE
 		</label>
 		<label>
 		    <input type="radio" value="HIGH" name="websiteSeverity">

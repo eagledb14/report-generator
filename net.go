@@ -356,11 +356,18 @@ func servOsint(app *fiber.App, state *types.State) {
 		inScope := c.FormValue("inScope")
 		outScope := c.FormValue("outScope")
 
-		inScopEvents := alerts.DownloadIpList(name, inScope)
-		outScopeEvents := alerts.DownloadIpList(name, outScope)
+		inScopEvents := []*alerts.Event{}
+		if inScope != "" {
+			inScopEvents = alerts.DownloadIpList(name, inScope)
+		}
+
+		outScopeEvents := []*alerts.Event{}
+		if outScope != "" {
+			outScopeEvents = alerts.DownloadIpList(name, outScope)
+		}
 
 		events := append(outScopeEvents, inScopEvents...)
-		events = alerts.FilterEvents(events)
+		events = alerts.FilterCveEvents(events)
 
 		recordedFutureCreds := alerts.ParseCredentialDump(c.FormValue("recordedFutureCreds"))
 		otherCreds := alerts.ParseOtherCreds(c.FormValue("otherCreds"))

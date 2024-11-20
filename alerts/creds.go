@@ -50,7 +50,7 @@ func ParseOtherCreds(creds string) []Credentials {
 		credSplit := strings.Split(cred, ",")
 		newCred := Credentials{}
 
-		if len(credSplit) == 0 {
+		if len(credSplit) == 1 {
 			continue
 		}
 

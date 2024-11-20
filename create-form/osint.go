@@ -1,7 +1,6 @@
 package createform
 
 import (
-	"fmt"
 
 	"github.com/eagledb14/form-scanner/alerts"
 	"github.com/eagledb14/form-scanner/templates"
@@ -21,7 +20,6 @@ type Osint struct {
 }
 
 func (o *Osint) CreateMarkdown() string {
-	fmt.Println(len(o.Events))
 	for _, event := range o.Events {
 		event.FilterCves()
 	}
@@ -181,6 +179,7 @@ The external IP; “{{$event.Ip}}” is tagged with vulnerabilities on Shodan. A
 The external IPs; {{range .Events}}“{{.Ip}}”, {{end}}are tagged with vulnerabilities on Shodan. Tables of the vulnerabilities for these IPs are found below.{{end}}
 
 {{if eq (len .Events) 0}}{{else}}{{range .Events}}{{if gt (len .Ports) 0}}
+
 **[{{.Ip}}]**
 
 | CVE-ID | PRIORITY | EPSS | CVSS | VERSION | SEVERITY | CISA_KEV | VENDOR | PRODUCT |
