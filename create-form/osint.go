@@ -127,7 +127,7 @@ It is essential to recognize that external assets, which the {{.Name}} may not b
 Such vulnerabilities emphasize the importance of proactive asset discovery, patch management, and security measures to safeguard {{.Name}} from these vulnerabilities.{{end}}{{end}}
 
 ## Vulnerable Websites
-The NCNG Searched open-source databases and dark web bug bounty markets for vulnerabilities on {{.Urls}} and found {{if eq .VulnerableUrls 1}}1 finding{{else if gt .VulnerableUrls 1}}{{.VulnerableUrls}} findings{{else}}no issues{{end}}. 
+The NCNG Searched open-source databases and dark web bug bounty markets for vulnerabilities associated with {{.Urls}} and found {{if eq .VulnerableUrls 1}}1 finding{{else if gt .VulnerableUrls 1}}{{.VulnerableUrls}} findings{{else}}no issues{{end}}. 
 
 {{if gt (len .Creds) 0}}
 ---

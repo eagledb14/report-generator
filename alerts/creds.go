@@ -1,6 +1,7 @@
 package alerts
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 )
@@ -18,16 +19,43 @@ func ParseCredentialDump(passwordDump string) []Credentials {
 
 	lines := strings.Split(passwordDump, "\n")
 
-	for i, line := range lines {
+	emails := []string{}
+	for _, line := range lines {
+		if strings.Contains(line, "Credential leak") {
+			emails = []string{}
+
+			emailSplit := strings.Split(line, " ")
+
+			for _, text := range emailSplit {
+				if strings.Contains(text, "@") {
+					text = strings.ReplaceAll(text, ",", "")
+					emails = append(emails, text)
+				}
+			}
+
+			for _, email := range emails {
+				credentialMap[email] = Credentials{
+					Email: email,
+					LeakType: "Email Address",
+					AccountType: "Agency",
+				}
+			}
+		}
+
 		if strings.Contains(line, "Source") {
 			source := parseSource(line)
-			email, pass := parseEmail(lines[i-1])
-			credentialMap[email] = Credentials{
-				Email:    strings.TrimLeft(email, " "),
-				Password: pass,
-				Source:   source,
-				LeakType: "Email Address",
-				AccountType: "Agency",
+			for _, email := range emails {
+				cred, _ := credentialMap[email]
+				cred.Source = source
+				credentialMap[email] = cred
+			}
+		}
+
+		if strings.HasPrefix(line, "    ") {
+			for _, email := range emails {
+				cred, _ := credentialMap[email]
+				cred.Password = hasPassword(line)
+				credentialMap[email] = cred
 			}
 		}
 	}
@@ -97,15 +125,9 @@ func parseSource(source string) string {
 	return strings.Join(parts[1:endIndex], " ")
 }
 
-func parseEmail(email string) (string, bool) {
-	parts := strings.Split(email, ":")
-	hasPassword := false
+func hasPassword(line string) bool {
+	parts := strings.Split(line, ":")
 
-	if len(parts) >= 2 {
-		hasPassword = true
-	}
-	if len(parts[0]) > 0 && parts[0][len(parts[0])-1] == '.' {
-		return parts[0][:len(parts[0])-1], hasPassword
-	}
-	return strings.ToLower(parts[0]), hasPassword
+	return len(parts) >= 2
 }
+
