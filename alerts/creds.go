@@ -1,7 +1,6 @@
 package alerts
 
 import (
-	"fmt"
 	"sort"
 	"strings"
 )
