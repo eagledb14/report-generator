@@ -21,7 +21,7 @@ func ParseCredentialDump(passwordDump string) []Credentials {
 	for i, line := range lines {
 		if strings.Contains(line, "Source") {
 			source := parseSource(line)
-			email, pass := parseEmail(lines[i-2])
+			email, pass := parseEmail(lines[i-1])
 			credentialMap[email] = Credentials{
 				Email:    strings.TrimLeft(email, " "),
 				Password: pass,

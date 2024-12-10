@@ -354,7 +354,14 @@ func servOsint(app *fiber.App, state *types.State) {
 	app.Post("/osint", func(c *fiber.Ctx) error {
 		name := strings.Clone(c.FormValue("orgName"))
 		inScope := c.FormValue("inScope")
+		inScopeList := strings.FieldsFunc(inScope, func(r rune) bool {
+			return r == ',' || r == ' '
+		})
+
 		outScope := c.FormValue("outScope")
+		outScopeList := strings.FieldsFunc(outScope, func(r rune) bool {
+			return r == ',' || r == ' '
+		})
 
 		inScopEvents := []*alerts.Event{}
 		if inScope != "" {
@@ -379,8 +386,8 @@ func servOsint(app *fiber.App, state *types.State) {
 
 		form := createform.Osint{
 			Name: name, 
-			InScope: strings.Split(inScope, ","),
-			OutScope: strings.Split(outScope, ","),
+			InScope: inScopeList,
+			OutScope: outScopeList,
 			Events: events,
 			Creds: creds,
 			Url: c.FormValue("url"),

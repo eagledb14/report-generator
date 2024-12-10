@@ -285,6 +285,10 @@ type Net struct {
 
 func DownloadMatches(queries string) Net {
 	apiKey := os.Getenv("API_KEY")
+	parts := strings.FieldsFunc(queries, func(r rune) bool {
+		return r == ',' || r == ' '
+	})
+	queries = strings.Join(parts, ",")
 	queries = strings.ReplaceAll(queries, " ", "")
 
 	url := "https://api.shodan.io/shodan/host/search?key=" + apiKey + "&query=net:" + queries

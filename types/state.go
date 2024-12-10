@@ -26,10 +26,10 @@ func NewState() State {
 	Tlp: true,
 	Report: Header,
     }
+    _ = newState
 
     newState.LoadEvents()
     return newState
-    // return State{}
 }
 
 func (e *State) LoadEvents() {
