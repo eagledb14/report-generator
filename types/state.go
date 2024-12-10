@@ -28,7 +28,7 @@ func NewState() State {
     }
     _ = newState
 
-    newState.LoadEvents()
+    go newState.LoadEvents()
     return newState
 }
 

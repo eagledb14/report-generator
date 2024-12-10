@@ -3,11 +3,8 @@ package main
 import (
 	"bufio"
 	"flag"
-	"fmt"
 	"net"
 	"os"
-	"os/exec"
-	"runtime"
 	"strconv"
 	"strings"
 
@@ -37,27 +34,7 @@ if os.Getenv("DEV") == "true" {
 			port, _ = getRandomPort()
 		}
 
-		go openBrowser("localhost" + port)
 		serv(port, &state)
-	}
-}
-
-func openBrowser(url string) {
-	var err error
-
-	switch runtime.GOOS {
-	case "linux":
-		err = exec.Command("xdg-open", url).Start()
-	case "windows":
-		err = exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
-	case "darwin":
-		err = exec.Command("open", url).Start()
-	default:
-		err = fmt.Errorf("unsupported platform")
-	}
-
-	if err != nil {
-		fmt.Println("Error opening browser:", err)
 	}
 }
 
