@@ -310,6 +310,9 @@ func DownloadMatches(queries string) Net {
 }
 
 func DownloadIpList(name string, queries string) []*Event {
+	if queries == "" {
+		return []*Event{}
+	}
 	net := DownloadMatches(queries)
 	var wg sync.WaitGroup
 	events := []*Event{}

@@ -81,11 +81,7 @@ img {
 	justify-content: center;
 	align-items: center;
 }
-.content {
-	max-width: 1000px;
-	margin: 0 auto;
-	padding: 20px;
-}
+
 h3 {
 	background-color: #E0E0E0;
 }
@@ -106,7 +102,7 @@ table, th, td {
     text-align: center;
 }
 th {
-    background-color: blue;
+    background-color: #081c4c;
     color: white;
     padding: 4px;
 }
@@ -116,3 +112,9 @@ th {
 func getAlertId(formNumber string) string {
 	return time.Now().Format("20060102") + formNumber
 }
+
+/*.content {
+	max-width: 1000px;
+	margin: 0 auto;
+	padding: 20px;
+}*/

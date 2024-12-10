@@ -7,3 +7,4 @@ resources/*.db
 *.env
 *.docx
 shodan-form*
+*.zip

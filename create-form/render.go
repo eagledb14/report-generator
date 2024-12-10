@@ -1,6 +1,8 @@
 package createform
 
 import (
+	"strings"
+
 	"github.com/gomarkdown/markdown"
 )
 
@@ -12,7 +14,7 @@ func CreateHeaderHtml(md string, title string, amber bool) string {
 
 func CreateCoverHtml(md string, title string) string {
 	html := getHtmlBody(md)
-	file := "<!DOCTYPE html>\n" + "<head>\n<meta charset=\"UTF-8\">\n" + styles() + "\n</head>\n" + cover(title) + html
+	file := "<!DOCTYPE html>\n" + "<head>\n<meta charset=\"UTF-8\">\n" + styles() + "\n</head>\n" + cover(strings.ToUpper(title)) + html
 
 	return file
 }

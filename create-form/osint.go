@@ -1,6 +1,7 @@
 package createform
 
 import (
+	"html/template"
 	"sort"
 
 	"github.com/eagledb14/form-scanner/alerts"
@@ -72,6 +73,12 @@ func (o *Osint) CreateMarkdown() string {
 		Disclaimer:      disclaimer(o.Name),
 	}
 
+	funcMap := template.FuncMap{
+		"add": func(a, b int) int {
+			return a + b
+		},
+	}
+
 	const page = `
 ## Overall Risk Exposure Ratings
 
@@ -84,38 +91,41 @@ The information below shows the numbers of issues identified in different catego
 | Discover Vulnerable Websites | Using Open-source Tools to Discover Domains, Subdomains and Hostnames | {{.WebsiteSeverity}} | {{.VulnerableUrls}} Vulnerable websites identified |
 
 
-## External Asset Discovery
+## 1. External Asset Discovery
 
 The initial phase of the passive review is External Asset Discovery. In this section, the North Carolina National Guard (NCNG) searches through open-source databases, search-engines, and Pastebin to discover external assets owned by {{.Name}}. All of the information within this section is intended to help your organization gain better visibility and exposed asset awareness of external assets.
 
-### External IPs Provided Within Scope
+The IPs provided below are associated with {{.Name}}’s domain on open-source DNS record websites, and are provided solely for {{.Name}}’s awareness.
 
-{{range .InScopeIps}}
-- {{.}}
+### 1.1 External IPs Provided Within Scope
+
+{{range $index, $val := .InScopeIps}}
+{{add $index 1}}. {{$val}}
 {{end}}
 
-### External IPs Indentified Outside Of Scope
+### 1.2 External IPs Indentified Outside Of Scope
 
-{{range .OutScopeIps}}
-- {{.}}
+{{range $index, $val := .OutScopeIps}}
+{{add $index 1}}. {{$val}}
 {{end}}
 
-The IPs provided above are associated with {{.Name}}’s domain on open-source DNS record websites. Provided solely for {{.Name}}’s awareness.
 
 ---
 
-## Identifying Vulnerable External Devices with Shodan
+## 2. Identifying Vulnerable External Devices with Shodan
 
 Shodan.io is an open-source search engine that is designed to gather information about internet-connected devices and systems. The NCNG searched Shodan’s public database for any assets owned by {{.Name}} using the CIDR Blocks or IP addresses provided within scope and identified through asset discovery. 
 
-The table below uses the Exploit Prediction Scoring System (EPSS) and Common Vulnerability Scoring System (CVSS) to measure vulnerabilities. EPSS produces prediction scores between 0 and 1 (0 and 100%) where higher scores suggest probability of exploit and CVSS rates the severity of a vulnerability. Vulnerabilities are prioritized in order from 1 to 4, 1+ being the most severe and 4 being the least severe.
+### 2.1 Scoring 
+The table below uses the Exploit Prediction Scoring System (EPSS) and Common Vulnerability Scoring System (CVSS) to measure vulnerabilities. EPSS produces prediction scores between 0 and 1 (0 and 100%) where higher scores suggest probability of exploit and CVSS rates the severity of a vulnerability. Vulnerabilities are prioritized in order from 0 to 4, 0 being the most severe and 4 being the least severe.
 
+### 2.2 Results/Findings
 Within the list of IP addresses above, {{len .Events}} vulnerable asset(s) are indexed by Shodan.
 
 {{.CveDisplay}}
 
 {{if gt (len .Events) 0}}
-### Impact to Agency (External Asset Vulnerabilities)
+### 2.? Impact to Agency (External Asset Vulnerabilities)
 
 {{if gt (len .MaxPriority) 0}}
 It is essential to recognize that external assets, which {{.Name}} may not be fully aware of, could pose significant risks. These risks might encompass unpatched software, misconfigurations, exposed sensitive data, or critical vulnerabilities, such as the {{len .MaxPriority}} number of Priority 1 CVEs expanded upon below. 
@@ -130,7 +140,7 @@ It is essential to recognize that external assets, which the {{.Name}} may not b
 
 Such vulnerabilities emphasize the importance of proactive asset discovery, patch management, and security measures to safeguard {{.Name}} from these vulnerabilities.{{end}}{{end}}
 
-## Vulnerable Websites
+## 3. Vulnerable Websites
 The NCNG Searched open-source databases and dark web bug bounty markets for vulnerabilities associated with {{.Urls}} and found {{if eq .VulnerableUrls 1}}1 finding{{else if gt .VulnerableUrls 0}}{{.VulnerableUrls}} findings{{else}}no issues{{end}}. 
 
 ### Impact to Agency (Vulnerable Websites)
@@ -139,11 +149,13 @@ The NCNG Searched open-source databases and dark web bug bounty markets for vuln
 
 {{if gt (len .Creds) 0}}
 ---
-## Exposed Credentials
+## 4. Exposed Credentials
 
 The NCNG employs open-source tools to proactively search for instances of credential exposure. These tools are specifically designed to identify leaked credentials by crawling through data breaches, popular PasteBin websites, such as ihavebeenpwned and other common public exposure locations where compromised accounts may be found. By leveraging these open-source tools, the NCNG aims to detect any instances where sensitive information, such as usernames and passwords, have been compromised and/or publicly disclosed. This proactive approach helps mitigate the risk of unauthorized access to {{.Name}}’s systems or personnel accounts.
 
 The tools systematically scan and analyze data breaches, which are incidents where large amounts of confidential information are illegally obtained and made publicly available. Additionally, they monitor platforms like PasteBins, which are websites commonly used for sharing text-based content, including compromised account credentials. Through the use of these open-source tools, the NCNG can swiftly identify compromised accounts associated with {{.Name}} personnel or systems. This allows for immediate action, such as resetting passwords, notifying affected individuals, and implementing additional security measures to prevent unauthorized access or potential misuse of compromised credentials.
+
+### 4.1 Results
 
 By actively searching for credential exposure using open-source tools, {{.Name}} demonstrates a proactive and vigilant approach to safeguarding their digital assets and protecting sensitive information from falling into the wrong hands.
 	
@@ -151,7 +163,7 @@ By actively searching for credential exposure using open-source tools, {{.Name}}
 |---|---|---|---|{{range .Creds}}
 | {{.Email}} | {{.LeakType}} | {{.Source}} | {{.AccountType}} |{{end}}
 
-### Impact to Agency (Exposed Credentials)
+### 4.2 Impact to Agency (Exposed Credentials)
 It is important to understand the risks that exposed credentials pose to {{.Name}}’s security posture, as they can grant unauthorized access to sensitive systems, data, and infrastructure. When credentials are compromised, malicious actors can utilize this information for a variety of harmful activities, such as obtaining initial access, laterally moving within the network, exiling sensitive data, or launching further attacks. By actively uncovering these exposed credentials, the NCNG aims to raise awareness within {{.Name}} and facilitate the implementation of appropriate security measures to mitigate potential threats.
 
 While the discovery of leaked credentials in this report raises valid concerns, it is important to emphasize that their presence does not necessarily imply that a user's domain account has been compromised. Credentials can be exposed through various channels, including breaches of unrelated external services, and may not directly impact {{.Name}}’s internal systems. Additionally, if robust security measures like multi-factor authentication (MFA) are in place, the risk of unauthorized access remains significantly reduced, even if the credentials have been exposed. By identifying these leaks, The NCNG aims to proactively address potential risks and ensure that appropriate security measures are implemented.
@@ -169,7 +181,7 @@ By implementing these recommendations, {{.Name}} can enhance its security postur
 {{.Disclaimer}}
 `
 
-	return templates.ExecuteText("osintmd", page, data)
+	return templates.ExecuteFunctions("osintmd", page, data, funcMap)
 }
 
 func displayCves(events []*alerts.Event) string {
@@ -180,21 +192,29 @@ func displayCves(events []*alerts.Event) string {
 		Events: events,
 	}
 
+	funcMap := template.FuncMap{
+		"add": func(a, b int) int {
+			return a + b
+		},
+	}
+
 	const page = `
 {{if eq (len .Events) 0}}{{else if eq (len .Events) 1}}{{$event := index .Events 0}}
 The external IP; “{{$event.Ip}}” is tagged with vulnerabilities on Shodan. A table of the vulnerabilities for this IP is found below.
 {{else}}
 The external IPs; {{range .Events}}“{{.Ip}}”, {{end}}are tagged with vulnerabilities on Shodan. Tables of the vulnerabilities for these IPs are found below.{{end}}
 
-{{if eq (len .Events) 0}}{{else}}{{range .Events}}{{if gt (len .Ports) 0}}
+{{if eq (len .Events) 0}}{{else}}{{range $index, $val := .Events}}{{if gt (len .Ports) 0}}
 
-**[{{.Ip}}]**
+**2.{{add $index 3}} [{{$val.Ip}}]**
 
 | CVE-ID | PRIORITY | EPSS | CVSS | VERSION | SEVERITY | CISA_KEV | VENDOR | PRODUCT |
-|---|---|---|---|---|---|---|---|---|{{range $key, $cve := .Ports}}{{range $cve}}
-| {{.Name}} | Priority {{.Rank}} | {{.Epss}} | {{.Cvss}} | {{.Version}} | {{.Severity}} | {{.Kev}} | {{.Vendor}} | {{.Product}} |{{end}}{{end}}{{end}}{{end}}{{end}}`
+|---|---|---|---|---|---|---|---|---|{{range $key, $cve := $val.Ports}}{{range $cve}}
+| {{.Name}} | Priority {{.Rank}} | {{.Epss}} | {{.Cvss}} | {{.Version}} | {{.Severity}} | {{.Kev}} | {{.Vendor}} | {{.Product}} |{{end}}{{end}}{{end}}{{end}}
+<br>
+{{end}}`
 
-	return templates.Execute("displayCves", page, data)
+	return templates.ExecuteFunctions("displayCves", page, data, funcMap)
 }
 
 func displayUrlCves(events []*alerts.Event, url string) string {
@@ -226,11 +246,6 @@ func displayUrlCves(events []*alerts.Event, url string) string {
 		Url: url,
 	}
 	const page = `
-{{range .Events}}
-**{{.Ip}}: {{$.Url}}**
-{{end}}
-<br>
-
 {{range .Cves}}
 - {{.Name}}: Priority {{.Rank}}
 	- {{.Summary}}
@@ -255,17 +270,17 @@ func recommendations(name string, creds bool) string {
 Based on the findings from the External Asset Discovery phase, the NCNG strongly recommends the following actions to {{.Name}}:
 
 1. Regular Vulnerability Assessments: Conduct comprehensive and periodic vulnerability assessments of all identified external assets. This will help identify and prioritize vulnerabilities that need to be addressed promptly.
-2. Configuration Reviews: Perform regular reviews of configurations for all external assets to ensure they align with industry best practices and security standards. Misconfigurations can often lead to security weaknesses that attackers can exploit, so maintaining secure configurations is crucial.
+2. Account Usage: Employees are strongly advised to refrain from using their work email addresses for personal service sign-ups to reduce the risk of credentials being exposed through third-party breaches.
 3. Access Control and Authentication: Strengthen access controls for external assets by implementing strong authentication mechanisms, such as multifactor authentication (MFA), and regularly reviewing and revoking unnecessary privileges. This will help protect against unauthorized access attempts.
 4. Monitoring and Incident Response: Establish robust monitoring capabilities to detect and respond to any suspicious activity or potential breaches related to external assets. Implement an incident response plan that outlines the necessary steps to be taken in the event of a security incident.
 5. Employee Awareness and Training: Conduct regular cybersecurity awareness training for employees to educate them about the risks associated with external assets and how to follow best practices for security. This will help foster a culture of cybersecurity within {{.Name}} and empower employees to contribute to the overall protection of external assets.
-{{if .Creds}}6. Account Usage: Employees are strongly advised to refrain from using their work email addresses for personal service sign-ups to reduce the risk of credentials being exposed through third-party breaches.{{end}}
+6. Configuration Reviews: Perform regular reviews of configurations for all external assets to ensure they align with industry best practices and security standards. Misconfigurations can often lead to security weaknesses that attackers can exploit, so maintaining secure configurations is crucial.
 `
 	return templates.ExecuteText("recommendations", page, data)
 }
 
 func disclaimer(name string) string {
-	return `CUI / / FOR OFFICIAL USE ONLY. This document is the exclusive property of ` + name + `. It contains proprietary and confidential information and may not be duplicated, redistributed, or used, in whole or in part, in any form, without consent of ` + name + ` and North Carolina Cyber Security Response Force. Restricted / Confidential per N.C.G.S. § 132-6.1(c)`
+	return `CUI / / FOR OFFICIAL USE ONLY. This document is the exclusive property of ` + name + `. It contains proprietary and confidential information and may not be duplicated, redistributed, or used, in whole or in part, in any form, without consent of ` + name + ` and North Carolina Cyber G6/J6 Security Response Force. Restricted / Confidential per N.C.G.S. § 132-6.1(c)`
 }
 
 func filterMaxPriority(events []*alerts.Event) []alerts.Cve {

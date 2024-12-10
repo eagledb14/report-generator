@@ -405,7 +405,7 @@ func servOsint(app *fiber.App, state *types.State) {
 			WebsiteSeverity: c.FormValue("websiteSeverity"),
 		}
 		state.Name = form.Name
-		state.Title = ""
+		state.Title = form.Name
 		state.Report = types.Cover
 		state.Markdown = form.CreateMarkdown()
 
