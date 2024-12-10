@@ -1,6 +1,7 @@
 package createform
 
 import (
+	"sort"
 
 	"github.com/eagledb14/form-scanner/alerts"
 	"github.com/eagledb14/form-scanner/templates"
@@ -12,7 +13,8 @@ type Osint struct {
 	OutScope        []string
 	Events          []*alerts.Event
 	Url             string
-	VulnerableUrls int
+	UrlIps		[]*alerts.Event
+	VulnerableUrls	int
 	Creds           []alerts.Credentials
 	AssetSeverity   string
 	AccountSeverity string
@@ -37,6 +39,7 @@ func (o *Osint) CreateMarkdown() string {
 
 		Urls             string
 		VulnerableUrls int
+		UrlIpDisplay string
 
 		Creds        []alerts.Credentials
 		NumEmails    int
@@ -59,6 +62,7 @@ func (o *Osint) CreateMarkdown() string {
 
 		Urls:             o.Url,
 		VulnerableUrls: o.VulnerableUrls,
+		UrlIpDisplay: displayUrlCves(o.UrlIps, o.Url),
 
 		Creds:        o.Creds,
 		NumEmails:    len(o.Creds),
@@ -127,7 +131,11 @@ It is essential to recognize that external assets, which the {{.Name}} may not b
 Such vulnerabilities emphasize the importance of proactive asset discovery, patch management, and security measures to safeguard {{.Name}} from these vulnerabilities.{{end}}{{end}}
 
 ## Vulnerable Websites
-The NCNG Searched open-source databases and dark web bug bounty markets for vulnerabilities associated with {{.Urls}} and found {{if eq .VulnerableUrls 1}}1 finding{{else if gt .VulnerableUrls 1}}{{.VulnerableUrls}} findings{{else}}no issues{{end}}. 
+The NCNG Searched open-source databases and dark web bug bounty markets for vulnerabilities associated with {{.Urls}} and found {{if eq .VulnerableUrls 1}}1 finding{{else if gt .VulnerableUrls 0}}{{.VulnerableUrls}} findings{{else}}no issues{{end}}. 
+
+### Impact to Agency (Vulnerable Websites)
+{{.UrlIpDisplay}}
+
 
 {{if gt (len .Creds) 0}}
 ---
@@ -187,6 +195,49 @@ The external IPs; {{range .Events}}“{{.Ip}}”, {{end}}are tagged with vulnera
 | {{.Name}} | Priority {{.Rank}} | {{.Epss}} | {{.Cvss}} | {{.Version}} | {{.Severity}} | {{.Kev}} | {{.Vendor}} | {{.Product}} |{{end}}{{end}}{{end}}{{end}}{{end}}`
 
 	return templates.Execute("displayCves", page, data)
+}
+
+func displayUrlCves(events []*alerts.Event, url string) string {
+	uniqueCve := make(map[string]alerts.Cve)
+	for _, e := range events {
+		for _, cve := range e.Ports {
+			for _, c := range cve {
+				uniqueCve[c.Name] = c
+			}
+		}
+	}
+
+	cves := []alerts.Cve{}
+	for _, cve := range uniqueCve {
+		cves = append(cves, cve)
+	}
+
+	sort.Slice(cves, func(i, j int) bool {
+		return cves[i].Rank < cves[j].Rank
+	})
+
+	data := struct {
+		Events []*alerts.Event
+		Cves []alerts.Cve
+		Url string
+	} {
+		Events: events,
+		Cves: cves,
+		Url: url,
+	}
+	const page = `
+{{range .Events}}
+**{{.Ip}}: {{$.Url}}**
+{{end}}
+<br>
+
+{{range .Cves}}
+- {{.Name}}: Priority {{.Rank}}
+	- {{.Summary}}
+{{end}}
+`
+
+	return templates.Execute("displayUrlCves", page, data)
 }
 
 func recommendations(name string, creds bool) string {

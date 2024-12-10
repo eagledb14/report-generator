@@ -379,10 +379,17 @@ func servOsint(app *fiber.App, state *types.State) {
 		recordedFutureCreds := alerts.ParseCredentialDump(c.FormValue("recordedFutureCreds"))
 		otherCreds := alerts.ParseOtherCreds(c.FormValue("otherCreds"))
 
-		vulnerableUrls, _ := strconv.Atoi(c.FormValue("vulnerableUrls"))
+		urlIps := c.FormValue("urlIps")
+		urlCount := strings.FieldsFunc(urlIps, func(r rune) bool {
+			return r == ',' || r == ' '
+		})
+
+		vulnerableUrls := len(urlCount)
+		urlEvents := alerts.DownloadIpList("", urlIps)
 
 		creds := append(recordedFutureCreds, otherCreds...)
 		creds = alerts.SortCreds(creds)
+
 
 		form := createform.Osint{
 			Name: name, 
@@ -391,6 +398,7 @@ func servOsint(app *fiber.App, state *types.State) {
 			Events: events,
 			Creds: creds,
 			Url: c.FormValue("url"),
+			UrlIps: urlEvents,
 			VulnerableUrls: vulnerableUrls,
 			AssetSeverity: c.FormValue("assetSeverity"),
 			AccountSeverity: c.FormValue("accountSeverity"),

@@ -26,10 +26,9 @@ func Osint() string {
 		<input name="url"/>
 	    </label>
 
-
 	    <label>
-		Number of Vulnerable Urls 
-		<input name="vulnerableUrls"  />
+		Url IPs
+		<input name="urlIps" />
 	    </label>
 
 	    <hr>
