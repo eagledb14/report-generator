@@ -91,7 +91,7 @@ The information below shows the numbers of issues identified in different catego
 | Discover Vulnerable Websites | Using Open-source Tools to Discover Domains, Subdomains and Hostnames | {{.WebsiteSeverity}} | {{.VulnerableUrls}} Vulnerable websites identified |
 
 
-## 1. External Asset Discovery
+## 1 External Asset Discovery
 
 The initial phase of the passive review is External Asset Discovery. In this section, the North Carolina National Guard (NCNG) searches through open-source databases, search-engines, and Pastebin to discover external assets owned by {{.Name}}. All of the information within this section is intended to help your organization gain better visibility and exposed asset awareness of external assets.
 
@@ -112,7 +112,7 @@ The IPs provided below are associated with {{.Name}}’s domain on open-source D
 
 ---
 
-## 2. Identifying Vulnerable External Devices with Shodan
+## 2 Identifying Vulnerable External Devices with Shodan
 
 Shodan.io is an open-source search engine that is designed to gather information about internet-connected devices and systems. The NCNG searched Shodan’s public database for any assets owned by {{.Name}} using the CIDR Blocks or IP addresses provided within scope and identified through asset discovery. 
 
@@ -125,7 +125,7 @@ Within the list of IP addresses above, {{len .Events}} vulnerable asset(s) are i
 {{.CveDisplay}}
 
 {{if gt (len .Events) 0}}
-### 2.? Impact to Agency (External Asset Vulnerabilities)
+### 2.{{add (len .Events) 3}} Impact to Agency (External Asset Vulnerabilities)
 
 {{if gt (len .MaxPriority) 0}}
 It is essential to recognize that external assets, which {{.Name}} may not be fully aware of, could pose significant risks. These risks might encompass unpatched software, misconfigurations, exposed sensitive data, or critical vulnerabilities, such as the {{len .MaxPriority}} number of Priority 1 CVEs expanded upon below. 
@@ -140,7 +140,7 @@ It is essential to recognize that external assets, which the {{.Name}} may not b
 
 Such vulnerabilities emphasize the importance of proactive asset discovery, patch management, and security measures to safeguard {{.Name}} from these vulnerabilities.{{end}}{{end}}
 
-## 3. Vulnerable Websites
+## 3 Vulnerable Websites
 The NCNG Searched open-source databases and dark web bug bounty markets for vulnerabilities associated with {{.Urls}} and found {{if eq .VulnerableUrls 1}}1 finding{{else if gt .VulnerableUrls 0}}{{.VulnerableUrls}} findings{{else}}no issues{{end}}. 
 
 ### Impact to Agency (Vulnerable Websites)
