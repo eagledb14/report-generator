@@ -92,6 +92,7 @@ func getEventsString(events []*alerts.Event) string {
 {{$key}}
 {{range $value}}
 - [{{.Name}}](https://www.cve.org/CVERecord?id={{.Name}}) Priority: {{.Rank}}
+	- {{.Summary}}
 {{end}}
 {{end}}
 {{end}}
