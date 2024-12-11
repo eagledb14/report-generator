@@ -34,7 +34,7 @@ if os.Getenv("DEV") == "true" {
 			port, _ = getRandomPort()
 		}
 
-		serv(port, &state)
+		serv(port, state)
 	}
 }
 

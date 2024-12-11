@@ -18,17 +18,18 @@ type State struct {
     Report ReportType
 }
 
-func NewState() State {
-    feedEvents := alerts.DownloadRss()
+func NewState() *State {
 
-    newState :=  State{
-	FeedEvents: feedEvents,
+    newState := &State{
 	Tlp: true,
 	Report: Header,
     }
-    _ = newState
 
-    go newState.LoadEvents()
+    go func(state *State) {
+	feedEvents := alerts.DownloadRss()
+	newState.FeedEvents = feedEvents
+	newState.LoadEvents()
+    }(newState)
     return newState
 }
 
